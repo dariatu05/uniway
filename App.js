@@ -4,6 +4,7 @@ import { COLORS } from './theme/theme';
 
 import CalendarScreen from './screens/CalendarScreen';
 import FuelScreen from './screens/FuelScreen';
+import MapScreen from './screens/Map';
 import RouteScreen from './screens/RouteScreen';
 import SearchScreen from './screens/SearchScreen';
 
@@ -24,6 +25,7 @@ export default function App() {
                 <Tab.Screen name="Route" component={RouteScreen} options={{ title: 'Route' }} />
                 <Tab.Screen name="Fuel" component={FuelScreen} options={{ title: 'Sprit' }} />
                 <Tab.Screen name="Calendar" component={CalendarScreen} options={{ title: 'Kalender' }} />
+                <Tab.Screen name="Map" component={MapScreen} options={{ title: 'Karte' }} />
             </Tab.Navigator>
         </NavigationContainer>
     );
