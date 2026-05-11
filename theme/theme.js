@@ -1,8 +1,8 @@
 export const COLORS = {
-    primary: '#3B5BA9',
-    secondary: '#2AA7A1',
-    accent: '#B8E3E0',
-    background: '#F7FAFC',
+    primary: '#5B5FDE',
+    secondary: '#63C7B2',
+    accent: '#D7F3EC',
+    background: '#F8F9FD',
     surface: '#FFFFFF',
-    text: '#1F2937',
+    text: '#222831',
 };
