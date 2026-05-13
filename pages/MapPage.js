@@ -1,16 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../styles/colors';
+import { StyleSheet, View } from 'react-native';
 
-export default function FuelScreen() {
+import { Header } from '../components/Header';
+import { PageContainer } from '../components/PageContainer';
+import { RouteMap } from '../components/RouteMap';
+
+export default function MapPage() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Map</Text>
-            <Text>Text</Text>
-        </View>
+        <PageContainer>
+            <Header title="Karte" subtitle="Finde Routen in deiner Umgebung" />
+
+            <View style={styles.mapWrapper}>
+                <RouteMap />
+            </View>
+
+        </PageContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
-    title: { color: COLORS.primary, fontSize: 20, fontWeight: 'bold' }
+    mapWrapper: {
+        flex: 1,
+        marginTop: 10,
+    }
 });
