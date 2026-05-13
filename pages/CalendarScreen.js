@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../theme/theme';
+import { COLORS } from '../styles/colors';
 
-export default function FuelScreen() {
+export default function CalendarScreen() {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Spritkostenrechner</Text>
+            <Text style={styles.title}>Preisdarstellung</Text>
             <Text>Text</Text>
         </View>
     );

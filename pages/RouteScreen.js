@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../theme/theme';
+import { COLORS } from '../styles/colors';
 
-export default function SearchScreen() {
+export default function RouteScreen() {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Cheapest Route First</Text>
+            <Text style={styles.title}>Mehrere Reisepunkte</Text>
             <Text>Text</Text>
         </View>
     );
