@@ -9,16 +9,26 @@ import { Input } from '../components/Input';
 import { PageContainer } from '../components/PageContainer';
 import { SettingRow } from '../components/SettingRow';
 
+// Objekt welches globale Variablen speichert die von mehreren Screens genutzt werden können
+export const SHARED_DATA = {
+    budget: '150', // Initialwert
+    startort: 'Wien', // Initialwert
+    isLocationEnabled: true // Initialwert
+};
+
 export default function ProfilePage() {
     // Zustandsvariablen für Profilinformationen und Einstellungen
     const [name, setName] = useState('Max Mustermann');
-    const [startort, setStartort] = useState('Wien');
-    const [budget, setBudget] = useState('150');
+    const [startort, setStartort] = useState(SHARED_DATA.startort);
+    const [budget, setBudget] = useState(SHARED_DATA.budget);
 
-    const [isLocationEnabled, setIsLocationEnabled] = useState(true);
+    const [isLocationEnabled, setIsLocationEnabled] = useState(SHARED_DATA.isLocationEnabled);
     const [isPushEnabled, setIsPushEnabled] = useState(false);
 
     const handleSave = () => {
+        SHARED_DATA.budget = budget; // Aktualisiere das geteilte Budget
+        SHARED_DATA.startort = startort;
+        SHARED_DATA.isLocationEnabled = isLocationEnabled;
         console.log('Profil gespeichert:', { name, startort, budget, isLocationEnabled, isPushEnabled });
     };
 
