@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import {
-    clearExpiredRoutes,
-    deleteFavoriteRoute,
-    getExpiredRoutes,
-    getFavoriteRoutes,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import {
+  clearExpiredRoutes,
+  deleteFavoriteRoute,
+  getExpiredRoutes,
+  getFavoriteRoutes,
 } from "../api/storageApi";
 
-function SavedPage() {
+import { COLORS } from "../styles/colors";
+export default function SavedPage() {
   const [favorites, setFavorites] = useState([]);
   const [expiredRoutes, setExpiredRoutes] = useState([]);
 
@@ -36,139 +46,116 @@ function SavedPage() {
 
   function isExpired(route) {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const routeDate = new Date(route.date);
+    routeDate.setHours(0, 0, 0, 0);
 
     return routeDate < today;
   }
 
-  return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "20px",
-        backgroundColor: "#F8F9FD",
-        color: "#222831",
-        paddingBottom: "80px",
-      }}
-    >
-      <h1 style={{ color: "#5B5FDE", marginBottom: "16px" }}>
-        Gespeicherte Routen
-      </h1>
+  function openBookingUrl(url) {
+    if (url) {
+      Linking.openURL(url);
+    }
+  }
 
-      {expiredRoutes.length > 0 && (
-        <div
-          style={{
-            backgroundColor: "#ffe5e5",
-            borderRadius: "16px",
-            padding: "14px",
-            marginBottom: "16px",
-            color: "#7a1f1f",
-          }}
-        >
-          <strong>{expiredRoutes.length} Route(n) sind abgelaufen.</strong>
-          <p style={{ margin: "8px 0" }}>
+  return (
+    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Gespeicherte Routen</Text>
+
+      {expiredRoutes.length > 0 ? (
+        <View style={styles.expiredBanner}>
+          <Text style={styles.expiredTitle}>
+            {expiredRoutes.length} Route(n) sind abgelaufen.
+          </Text>
+
+          <Text style={styles.expiredText}>
             Diese Routen liegen in der Vergangenheit.
-          </p>
-          <button
-            type="button"
-            onClick={handleDeleteAllExpired}
-            style={dangerButtonStyle}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.dangerButton}
+            onPress={handleDeleteAllExpired}
           >
-            Alle abgelaufenen löschen
-          </button>
-        </div>
-      )}
+            <Text style={styles.buttonText}>Alle abgelaufenen löschen</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       {favorites.length === 0 ? (
-        <div style={emptyStateStyle}>
-          <h2>Keine gespeicherten Routen</h2>
-          <p>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyTitle}>Keine gespeicherten Routen</Text>
+          <Text style={styles.emptyText}>
             Gespeicherte Reisen werden hier angezeigt, sobald du eine Route
             speicherst.
-          </p>
-        </div>
+          </Text>
+        </View>
       ) : (
-        <div style={{ display: "grid", gap: "14px" }}>
-          {favorites.map((route) => {
-            const expired = isExpired(route);
+        favorites.map((route) => {
+          const expired = isExpired(route);
 
-            return (
-              <article
-                key={route.id}
-                style={{
-                  backgroundColor: expired ? "#3b1f1f" : "#FFFFFF",
-                  color: expired ? "#FFFFFF" : "#222831",
-                  borderRadius: "18px",
-                  padding: "16px",
-                  boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "12px",
-                  }}
-                >
-                  <div>
-                    <h2 style={{ margin: "0 0 8px" }}>
-                      {route.from} → {route.to}
-                    </h2>
-                    <p style={{ margin: "4px 0" }}>
-                      Datum: {formatDate(route.date)}
-                    </p>
-                    <p style={{ margin: "4px 0" }}>
-                      Verkehrsmittel: {route.mainTransport}
-                    </p>
-                    <p style={{ margin: "4px 0" }}>
-                      Dauer: {route.durationMinutes} Minuten
-                    </p>
-                  </div>
-
-                  <div style={{ textAlign: "right" }}>
-                    <strong style={{ fontSize: "22px" }}>
-                      {route.price} €
-                    </strong>
-                  </div>
-                </div>
-
-                {expired && (
-                  <p style={{ marginTop: "10px", color: "#ffb3b3" }}>
-                    Diese Route ist abgelaufen.
-                  </p>
-                )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginTop: "14px",
-                  }}
-                >
-                  {route.bookingUrl && (
-                    <button
-                      type="button"
-                      onClick={() => window.open(route.bookingUrl, "_blank")}
-                      style={primaryButtonStyle}
-                    >
-                      Anbieter öffnen
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(route.id)}
-                    style={dangerButtonStyle}
+          return (
+            <View
+              key={route.id}
+              style={[styles.card, expired && styles.expiredCard]}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.routeInfo}>
+                  <Text
+                    style={[styles.routeTitle, expired && styles.whiteText]}
                   >
-                    Löschen
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                    {route.from} → {route.to}
+                  </Text>
+
+                  <Text style={[styles.infoText, expired && styles.whiteText]}>
+                    Datum: {formatDate(route.date)}
+                  </Text>
+
+                  <Text style={[styles.infoText, expired && styles.whiteText]}>
+                    Verkehrsmittel: {route.mainTransport}
+                  </Text>
+
+                  <Text style={[styles.infoText, expired && styles.whiteText]}>
+                    Dauer: {route.durationMinutes} Minuten
+                  </Text>
+                </View>
+
+                <View style={styles.priceBox}>
+                  <Text style={[styles.price, expired && styles.whiteText]}>
+                    {route.price} €
+                  </Text>
+                </View>
+              </View>
+
+              {expired ? (
+                <Text style={styles.expiredRouteText}>
+                  Diese Route ist abgelaufen.
+                </Text>
+              ) : null}
+
+              <View style={styles.buttonRow}>
+                {route.bookingUrl ? (
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={() => openBookingUrl(route.bookingUrl)}
+                  >
+                    <Text style={styles.buttonText}>Anbieter öffnen</Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                <TouchableOpacity
+                  style={styles.dangerButton}
+                  onPress={() => handleDelete(route.id)}
+                >
+                  <Text style={styles.buttonText}>Löschen</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })
       )}
-    </main>
+    </ScrollView>
   );
 }
 
@@ -180,31 +167,124 @@ function formatDate(dateString) {
   });
 }
 
-const primaryButtonStyle = {
-  border: "none",
-  borderRadius: "12px",
-  padding: "10px 14px",
-  backgroundColor: "#5B5FDE",
-  color: "#FFFFFF",
-  cursor: "pointer",
-  fontWeight: "600",
-};
-
-const dangerButtonStyle = {
-  border: "none",
-  borderRadius: "12px",
-  padding: "10px 14px",
-  backgroundColor: "#b00020",
-  color: "#FFFFFF",
-  cursor: "pointer",
-  fontWeight: "600",
-};
-
-const emptyStateStyle = {
-  backgroundColor: "#FFFFFF",
-  borderRadius: "18px",
-  padding: "20px",
-  boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
-};
-
-export default SavedPage;
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  content: {
+    padding: 20,
+    paddingBottom: 80,
+  },
+  title: {
+    color: COLORS.primary,
+    fontSize: 30,
+    fontWeight: "900",
+    marginBottom: 16,
+  },
+  expiredBanner: {
+    backgroundColor: "#ffe5e5",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  },
+  expiredTitle: {
+    color: "#7a1f1f",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+  expiredText: {
+    color: "#7a1f1f",
+    marginTop: 8,
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  expiredCard: {
+    backgroundColor: "#3b1f1f",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  routeInfo: {
+    flex: 1,
+  },
+  routeTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  infoText: {
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  priceBox: {
+    alignItems: "flex-end",
+  },
+  price: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: COLORS.text,
+  },
+  whiteText: {
+    color: "#FFFFFF",
+  },
+  expiredRouteText: {
+    marginTop: 10,
+    color: "#ffb3b3",
+    fontWeight: "700",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 14,
+  },
+  primaryButton: {
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.primary,
+  },
+  dangerButton: {
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: "#b00020",
+    alignSelf: "flex-start",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+  },
+  emptyState: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 18,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  emptyTitle: {
+    color: COLORS.text,
+    fontSize: 22,
+    fontWeight: "900",
+    marginBottom: 8,
+  },
+  emptyText: {
+    color: COLORS.text,
+    lineHeight: 21,
+  },
+});

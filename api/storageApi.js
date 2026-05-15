@@ -1,19 +1,61 @@
+import { mockFavorites } from "../data/mockFavorites";
+
 const FAVORITES_KEY = "uniway_favorite_routes";
 const PROFILE_KEY = "uniway_profile_settings";
 
-export function getFavoriteRoutes() {
-  try {
-    const data = localStorage.getItem(FAVORITES_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error("Fehler beim Laden der Favoriten:", error);
-    return [];
+const memoryStorage = {};
+
+function hasLocalStorage() {
+  return typeof localStorage !== "undefined";
+}
+
+function getItem(key) {
+  if (hasLocalStorage()) {
+    return localStorage.getItem(key);
   }
+
+  return memoryStorage[key] || null;
+}
+
+function setItem(key, value) {
+  if (hasLocalStorage()) {
+    localStorage.setItem(key, value);
+    return;
+  }
+
+  memoryStorage[key] = value;
+}
+
+const defaultSettings = {
+  name: "UniWay User",
+  defaultLocation: "Wien",
+  locationEnabled: false,
+  pushEnabled: false,
+  currency: "EUR",
+  standardBudget: 100,
+  preferredTransports: ["bus", "train"],
+};
+
+export function getFavoriteRoutes() {
+  const storedFavorites = getItem(FAVORITES_KEY);
+
+  if (!storedFavorites) {
+    return mockFavorites;
+  }
+
+  try {
+    return JSON.parse(storedFavorites);
+  } catch (error) {
+    return mockFavorites;
+  }
+}
+
+export function saveFavoriteRoutes(routes) {
+  setItem(FAVORITES_KEY, JSON.stringify(routes));
 }
 
 export function saveFavoriteRoute(route) {
   const favorites = getFavoriteRoutes();
-
   const alreadyExists = favorites.some((item) => item.id === route.id);
 
   if (alreadyExists) {
@@ -21,7 +63,7 @@ export function saveFavoriteRoute(route) {
   }
 
   const updatedFavorites = [...favorites, route];
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
+  saveFavoriteRoutes(updatedFavorites);
 
   return updatedFavorites;
 }
@@ -31,74 +73,38 @@ export function deleteFavoriteRoute(routeId) {
 
   const updatedFavorites = favorites.filter((route) => route.id !== routeId);
 
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
+  saveFavoriteRoutes(updatedFavorites);
 
   return updatedFavorites;
 }
 
-export function isRouteSaved(routeId) {
+export function deleteExpiredFavoriteRoutes(isExpiredFn) {
   const favorites = getFavoriteRoutes();
-  return favorites.some((route) => route.id === routeId);
-}
 
-export function clearExpiredRoutes() {
-  const favorites = getFavoriteRoutes();
-  const today = new Date();
+  const updatedFavorites = favorites.filter((route) => !isExpiredFn(route));
 
-  const activeRoutes = favorites.filter((route) => {
-    const routeDate = new Date(route.date);
-    return routeDate >= today;
-  });
+  saveFavoriteRoutes(updatedFavorites);
 
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(activeRoutes));
-
-  return activeRoutes;
-}
-
-export function getExpiredRoutes() {
-  const favorites = getFavoriteRoutes();
-  const today = new Date();
-
-  return favorites.filter((route) => {
-    const routeDate = new Date(route.date);
-    return routeDate < today;
-  });
+  return updatedFavorites;
 }
 
 export function getProfileSettings() {
+  const storedSettings = getItem(PROFILE_KEY);
+
+  if (!storedSettings) {
+    return defaultSettings;
+  }
+
   try {
-    const data = localStorage.getItem(PROFILE_KEY);
-
-    if (!data) {
-      return {
-        name: "",
-        studentStatus: true,
-        defaultBudget: 100,
-        currency: "EUR",
-        language: "Deutsch",
-        defaultLocation: "Wien",
-        locationEnabled: false,
-        pushPriceDrop: true,
-        pushLastMinute: true,
-        studentDiscounts: true,
-        cheapestRouteFirst: true,
-        preferredTransports: {
-          car: false,
-          train: true,
-          bus: true,
-          plane: false,
-        },
-      };
-    }
-
-    return JSON.parse(data);
+    return {
+      ...defaultSettings,
+      ...JSON.parse(storedSettings),
+    };
   } catch (error) {
-    console.error("Fehler beim Laden der Profileinstellungen:", error);
-    return {};
+    return defaultSettings;
   }
 }
 
 export function saveProfileSettings(settings) {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(settings));
-  return settings;
+  setItem(PROFILE_KEY, JSON.stringify(settings));
 }

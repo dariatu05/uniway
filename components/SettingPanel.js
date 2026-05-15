@@ -1,4 +1,7 @@
-function SettingsPanel({ settings, onChange }) {
+import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { COLORS } from "../styles/colors";
+
+export default function SettingsPanel({ settings, onChange }) {
   function updateField(field, value) {
     onChange({
       ...settings,
@@ -17,78 +20,48 @@ function SettingsPanel({ settings, onChange }) {
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderRadius: "18px",
-        padding: "16px",
-        boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
-      }}
-    >
-      <h2 style={{ color: "#222831", marginBottom: "16px" }}>Einstellungen</h2>
+    <View style={styles.panel}>
+      <Text style={styles.title}>Einstellungen</Text>
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Name</label>
-        <input
-          type="text"
-          value={settings.name || ""}
-          onChange={(event) => updateField("name", event.target.value)}
-          placeholder="Dein Name"
-          style={inputStyle}
-        />
-      </div>
+      <InputBlock
+        label="Name"
+        value={settings.name || ""}
+        placeholder="Dein Name"
+        onChangeText={(value) => updateField("name", value)}
+      />
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Standard-Startort</label>
-        <input
-          type="text"
-          value={settings.defaultLocation || ""}
-          onChange={(event) =>
-            updateField("defaultLocation", event.target.value)
-          }
-          placeholder="z. B. Wien"
-          style={inputStyle}
-        />
-      </div>
+      <InputBlock
+        label="Standard-Startort"
+        value={settings.defaultLocation || ""}
+        placeholder="z. B. Wien"
+        onChangeText={(value) => updateField("defaultLocation", value)}
+      />
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Standardbudget</label>
-        <input
-          type="number"
-          value={settings.defaultBudget || ""}
-          onChange={(event) =>
-            updateField("defaultBudget", Number(event.target.value))
-          }
-          placeholder="z. B. 100"
-          style={inputStyle}
-        />
-      </div>
+      <InputBlock
+        label="Standardbudget"
+        value={String(settings.defaultBudget || "")}
+        placeholder="z. B. 100"
+        keyboardType="numeric"
+        onChangeText={(value) =>
+          updateField("defaultBudget", Number(value) || 0)
+        }
+      />
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Sprache</label>
-        <select
-          value={settings.language || "Deutsch"}
-          onChange={(event) => updateField("language", event.target.value)}
-          style={inputStyle}
-        >
-          <option>Deutsch</option>
-          <option>Englisch</option>
-        </select>
-      </div>
+      <InputBlock
+        label="Sprache"
+        value={settings.language || "Deutsch"}
+        placeholder="Deutsch"
+        onChangeText={(value) => updateField("language", value)}
+      />
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Währung</label>
-        <select
-          value={settings.currency || "EUR"}
-          onChange={(event) => updateField("currency", event.target.value)}
-          style={inputStyle}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-        </select>
-      </div>
+      <InputBlock
+        label="Währung"
+        value={settings.currency || "EUR"}
+        placeholder="EUR"
+        onChangeText={(value) => updateField("currency", value)}
+      />
 
-      <hr style={lineStyle} />
+      <View style={styles.line} />
 
       <Checkbox
         label="Studentenstatus aktiv"
@@ -126,9 +99,9 @@ function SettingsPanel({ settings, onChange }) {
         onChange={(value) => updateField("cheapestRouteFirst", value)}
       />
 
-      <hr style={lineStyle} />
+      <View style={styles.line} />
 
-      <h3 style={{ marginBottom: "10px" }}>Bevorzugte Verkehrsmittel</h3>
+      <Text style={styles.sectionTitle}>Bevorzugte Verkehrsmittel</Text>
 
       <Checkbox
         label="Auto"
@@ -153,45 +126,96 @@ function SettingsPanel({ settings, onChange }) {
         checked={settings.preferredTransports?.plane}
         onChange={(value) => updateTransport("plane", value)}
       />
-    </div>
+    </View>
+  );
+}
+
+function InputBlock({ label, value, placeholder, onChangeText, keyboardType }) {
+  return (
+    <View style={styles.inputBlock}>
+      <Text style={styles.label}>{label}</Text>
+
+      <TextInput
+        value={value}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType || "default"}
+        style={styles.input}
+        placeholderTextColor="#64748b"
+      />
+    </View>
   );
 }
 
 function Checkbox({ label, checked, onChange }) {
   return (
-    <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-        marginBottom: "10px",
-        color: "#222831",
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={Boolean(checked)}
-        onChange={(event) => onChange(event.target.checked)}
+    <View style={styles.checkboxRow}>
+      <Switch
+        value={Boolean(checked)}
+        onValueChange={onChange}
+        trackColor={{ false: "#dbe2ef", true: COLORS.accent }}
+        thumbColor={checked ? COLORS.primary : "#f4f4f5"}
       />
-      {label}
-    </label>
+
+      <Text style={styles.checkboxLabel}>{label}</Text>
+    </View>
   );
 }
 
-const inputStyle = {
-  width: "100%",
-  marginTop: "6px",
-  padding: "10px",
-  borderRadius: "10px",
-  border: "1px solid #D7F3EC",
-  backgroundColor: "#F8F9FD",
-  color: "#222831",
-};
-
-const lineStyle = {
-  border: "none",
-  borderTop: "1px solid #D7F3EC",
-  margin: "18px 0",
-};
-
-export default SettingsPanel;
+const styles = StyleSheet.create({
+  panel: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 18,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 22,
+    fontWeight: "900",
+    marginBottom: 16,
+  },
+  inputBlock: {
+    marginBottom: 14,
+  },
+  label: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 6,
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+    backgroundColor: COLORS.background,
+    color: COLORS.text,
+  },
+  line: {
+    borderTopWidth: 1,
+    borderTopColor: COLORS.accent,
+    marginVertical: 18,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
+  checkboxLabel: {
+    color: COLORS.text,
+    fontSize: 15,
+    flex: 1,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: "900",
+    marginBottom: 10,
+  },
+});

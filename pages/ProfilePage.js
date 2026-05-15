@@ -1,105 +1,55 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text } from "react-native";
 
-import { Button } from '../components/Button';
-import { Card } from '../components/Card';
-import { Divider } from '../components/Divider';
-import { Header } from '../components/Header';
-import { Input } from '../components/Input';
-import { PageContainer } from '../components/PageContainer';
-import { SettingRow } from '../components/SettingRow';
+import { getProfileSettings, saveProfileSettings } from "../api/storageApi";
 
-// Objekt welches globale Variablen speichert die von mehreren Screens genutzt werden können
-export const SHARED_DATA = {
-    budget: '150', // Initialwert
-    startort: 'Wien', // Initialwert
-    isLocationEnabled: true // Initialwert
-};
+import ProfileHeader from "../components/profile/ProfileHeader";
+import SettingsPanel from "../components/profile/SettingsPanel";
+import { COLORS } from "../styles/colors";
 
 export default function ProfilePage() {
-    // Zustandsvariablen für Profilinformationen und Einstellungen
-    const [name, setName] = useState('Max Mustermann');
-    const [startort, setStartort] = useState(SHARED_DATA.startort);
-    const [budget, setBudget] = useState(SHARED_DATA.budget);
+  const [settings, setSettings] = useState(() => getProfileSettings());
 
-    const [isLocationEnabled, setIsLocationEnabled] = useState(SHARED_DATA.isLocationEnabled);
-    const [isPushEnabled, setIsPushEnabled] = useState(false);
+  useEffect(() => {
+    saveProfileSettings(settings);
+  }, [settings]);
 
-    const handleSave = () => {
-        SHARED_DATA.budget = budget; // Aktualisiere das geteilte Budget
-        SHARED_DATA.startort = startort;
-        SHARED_DATA.isLocationEnabled = isLocationEnabled;
-        console.log('Profil gespeichert:', { name, startort, budget, isLocationEnabled, isPushEnabled });
-    };
+  return (
+    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Profil</Text>
 
-    return (
-        <PageContainer>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <Header title="Profil" subtitle="Verwalte deine Einstellungen" />
+      <Text style={styles.subtitle}>
+        Verwalte Standort, Budget und App-Einstellungen.
+      </Text>
 
-                <Card>
-                    <Input
-                        label="Name"
-                        placeholder="Dein Name"
-                        value={name}
-                        onChangeText={setName}
-                    />
-                    <Input
-                        label="Standard-Startort"
-                        placeholder="z.B. Wien"
-                        value={startort}
-                        onChangeText={setStartort}
-                    />
-                    <Input
-                        label="Standardbudget (€)"
-                        placeholder="z.B. 100"
-                        value={budget}
-                        onChangeText={setBudget}
-                    />
-                </Card>
+      <ProfileHeader
+        name={settings.name}
+        defaultLocation={settings.defaultLocation}
+      />
 
-                <Card>
-                    <SettingRow
-                        label="Standortfreigabe"
-                        value={isLocationEnabled}
-                        onValueChange={setIsLocationEnabled}
-                    />
-
-                    <Divider />
-
-                    <SettingRow
-                        label="Push-Benachrichtigungen"
-                        value={isPushEnabled}
-                        onValueChange={setIsPushEnabled}
-                    />
-                </Card>
-
-                <View style={styles.buttonWrapper}>
-                    <Button
-                        title="Einstellungen speichern"
-                        onPress={handleSave}
-                        variant="primary"
-                    />
-                </View>
-
-                <View style={styles.logoutWrapper}>
-                    <Button
-                        title="Abmelden"
-                        onPress={() => console.log('Logout')}
-                        variant="secondary"
-                    />
-                </View>
-            </ScrollView>
-        </PageContainer>
-    );
+      <SettingsPanel settings={settings} onChange={setSettings} />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    buttonWrapper: {
-        marginTop: 20,
-        marginBottom: 10,
-    },
-    logoutWrapper: {
-        marginBottom: 30,
-    }
+  page: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  content: {
+    padding: 20,
+    paddingBottom: 80,
+  },
+  title: {
+    color: COLORS.primary,
+    fontSize: 30,
+    fontWeight: "900",
+    marginBottom: 6,
+  },
+  subtitle: {
+    color: "#64748b",
+    fontSize: 15,
+    marginBottom: 18,
+  },
 });
