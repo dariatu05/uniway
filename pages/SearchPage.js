@@ -25,6 +25,9 @@ import { COLORS } from '../styles/colors';
 import { getProfileSettings } from '../api/storageApi';
 import { MOCK_CALENDAR_PRICES } from '../data/SearchScreenMockData';
 
+// Person 3 — Ergebnisliste
+import ResultsPage from './ResultsPage';
+
 // Kalender Konfiguration
 LocaleConfig.locales['de'] = {
     monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
@@ -228,16 +231,17 @@ export default function SearchScreen() {
                 </ScrollView>
             )}
 
-            {/* ZUSTAND 4: Ergebnisanzeige (Leer für Person 3) */}
+            {/* ZUSTAND 4: Ergebnisanzeige (Person 3) */}
             {showRouteResults && (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <BackLink />
-                    <Header title={`Ergebnisse am ${selectedDate}`} subtitle={`${startLocation} ➔ ${destination}`} />
-                    <View style={{ flex: 1, padding: 20, alignItems: 'center' }}>
-                        <Text style={{ color: '#6b7280', fontStyle: 'italic' }}>Hier werden die Ergebnisse von Person 3 geladen</Text>
-                    </View>
-                    <View style={{ marginBottom: 30 }} />
-                </ScrollView>
+                <ResultsPage
+                    from={startLocation}
+                    to={destination}
+                    selectedDate={selectedDate}
+                    maxBudget={maxBudget}
+                    selectedTransports={selectedTransports}
+                    directOnly={directOnly}
+                    onBack={onBackPress}
+                />
             )}
         </PageContainer>
     );
