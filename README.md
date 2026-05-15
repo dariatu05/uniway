@@ -14,7 +14,12 @@ GerÃ¤t(e), auf dem(denen) getestet wurde:
 [Pixel 9]
 
 Externe Libraries und Frameworks:
-react-native-calendars
+- react-native-calendars
+- react-native-safe-area-context
+- @react-navigation/native
+- @react-navigation/bottom-tabs
+- react-native-maps
+
 
 Dauer der Entwicklung:
 [XX Stunden]
