@@ -1,12 +1,14 @@
-// Kurzbeschreibung: Dieser Suchscreeen hat 3 Zustände:
-// 1. Startbildschirm mit Suchleiste - führt zur detaillierten Suche
+// Kurzbeschreibung: Dieser Suchscreeen hat 4 Zustände:
+// 1. Startbildschirm mit Suchleiste
 // 2. Detaillierte Suche mit erweiterten Optionen
-// 3. Suchergebnisse in Kalenderform
+// 3. Preisanzeige in Kalenderform
+// 4. Anzeige der Routen-Ergebnisse
 
 // Externe Libraries
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 
 // Komponenten
 import { Button } from '../components/Button';
@@ -25,176 +27,157 @@ import { MOCK_CALENDAR_PRICES } from '../data/SearchScreenMockData';
 // Importiere globale Variable aus ProfilePage
 import { SHARED_DATA } from './ProfilePage';
 
-export default function SearchScreen() {
-    // später entfernen, wenn echte Daten geladen werden:
-    console.log("Daten geladen:", MOCK_CALENDAR_PRICES);
+// Kalender Konfiguration
+LocaleConfig.locales['de'] = {
+    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+    monthNamesShort: ['Jan.','Feb.','Mrz.','Apr.','Mai','Jun.','Jul.','Aug.','Sept.','Okt.','Nov.','Dez.'],
+    dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+    dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+    today: 'Heute'
+};
+LocaleConfig.defaultLocale = 'de';
 
+export default function SearchScreen() {
     // Zustandssteuerung
     const [showDetails, setShowDetails] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false); 
+    const [showRouteResults, setShowRouteResults] = useState(false);
 
     // Speicher für Suchparameter
     const [startLocation, setStartLocation] = useState('');
     const [destination, setDestination] = useState('');
-    const [dateOrRange, setDateOrRange] = useState('');
-    const [roundTrip, setRoundTrip] = useState(false);
+    const [dateFrom, setDateFrom] = useState(''); 
+    const [dateTo, setDateTo] = useState('');     
     const [maxBudget, setMaxBudget] = useState('');
+    const [directOnly, setDirectOnly] = useState(false);
     const [selectedTransports, setSelectedTransports] = useState([]);
     const [useDefaultBudget, setUseDefaultBudget] = useState(false);
+    const [selectedDate, setSelectedDate] = useState('');
 
-    // Transportmöglichkeiten und Icons
-    const transports = ['Bus', 'Zug', 'Auto', 'Flug'];
-    const transportIcons = {
-        'Bus': 'bus',
-        'Zug': 'train',
-        'Auto': 'car',
-        'Flug': 'airplane'
-    };
+    // Transportmittel Optionen
+    const transports = ['Bus', 'Zug', 'Auto', 'Flugzeug'];
+    const transportIcons = { 'Bus': 'bus', 'Zug': 'train', 'Auto': 'car', 'Flugzeug': 'airplane' };
 
-    const handleUseProfileLocation = () => {
-        setStartLocation(SHARED_DATA.startort);
-    };
-
-    // Funktion zum Umschalten des Standardbudgets
-    const handleToggleDefaultBudget = (value) => {
-        setUseDefaultBudget(value);
-        if (value) {
-            // Übernimmt das Budget direkt aus den ProfilePage-Vorgaben
-            setMaxBudget(SHARED_DATA.budget);
-        } else {
-            setMaxBudget('');
+    // Logik für Zurück-Button
+    const onBackPress = () => {
+        if (showRouteResults) {
+            setShowRouteResults(false);
+            setShowCalendar(true);
+        } else if (showCalendar) {
+            setShowCalendar(false);
+            setShowDetails(true);
+        } else if (showDetails) {
+            setShowDetails(false);
         }
     };
 
+    // Logik für Budget-Übernahme aus Profil
+    const handleToggleDefaultBudget = (value) => {
+        setUseDefaultBudget(value);
+        if (value) setMaxBudget(SHARED_DATA.budget);
+        else setMaxBudget('');
+    };
+
+    // Logik für Transportmittel-Auswahl
     const toggleTransport = (transport) => {
         setSelectedTransports(prev =>
             prev.includes(transport) ? prev.filter(t => t !== transport) : [...prev, transport]
         );
     };
 
-    const onSearchBarPress = () => setShowDetails(true);
-    
-    const onBackPress = () => {
-        if (showCalendar) {
-            setShowCalendar(false);
-        } else {
-            setShowDetails(false);
-        }
+    // Hilfsfunktion für Preisfarben im Kalender
+    const getPriceColor = (level) => {
+        if (level === 'cheap') return '#76943C'; 
+        if (level === 'medium') return '#D4A017'; 
+        if (level === 'expensive') return '#A52A2A'; 
+        return '#999';
     };
 
-    const onSubmit = () => {
-        console.log('Suche gestartet mit:', { startLocation, destination, dateOrRange, roundTrip, maxBudget, selectedTransports });
-        setShowCalendar(true);
-    };
+    // Komponente für den Zurück-Link
+    const BackLink = () => (
+        <TouchableOpacity style={styles.backLink} onPress={onBackPress}>
+            <MaterialCommunityIcons name="chevron-left" size={24} color={COLORS.primary} />
+            <Text style={styles.backLinkText}>Zurück</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <PageContainer>
-            {/* ZUSTAND 1: Startbildschirm */}
-            {!showDetails && !showCalendar && (
+            {/* ZUSTAND 1: Startseite */}
+            {!showDetails && !showCalendar && !showRouteResults && (
                 <View style={styles.homeContainer}>
-                    <Header 
-                        title="UniWay" 
-                        subtitle="Multifunktionaler Reiseplaner für Studierende" 
-                    />
-                    <TouchableOpacity style={styles.searchBar} onPress={onSearchBarPress} activeOpacity={0.8}>
+                    <Header title="UniWay" subtitle="Multifunktionaler Reiseplaner für Studierende" />
+                    <TouchableOpacity style={styles.searchBar} onPress={() => setShowDetails(true)} activeOpacity={0.8}>
                         <Text style={styles.placeholderText}>Wohin möchten Sie reisen?</Text>
                     </TouchableOpacity>
-                    <Text style={styles.hintText}>Tippen Sie oben, um Details einzugeben.</Text>
                 </View>
             )}
 
             {/* ZUSTAND 2: Detaillierte Suche */}
-            {showDetails && !showCalendar && (
+            {showDetails && !showCalendar && !showRouteResults && (
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <Header 
-                        title="Reise suchen" 
-                        subtitle="Finde die günstigste Route für dein Budget" 
-                    />
-
+                    <BackLink />
+                    <Header title="Reise suchen" subtitle="Finde die günstigste Route" />
                     <Card>
-                    <View style={{ marginBottom: 15 }}>
-                                        <Input 
-                                            label="Startort" 
-                                            placeholder="z.B. Wien" 
-                                            value={startLocation} 
-                                            onChangeText={setStartLocation} 
-                                        />
-                                        
-                                        {/* Logik: Nur anzeigen, wenn im Profil die Freigabe aktiv ist */}
-                                        {SHARED_DATA.isLocationEnabled && (
-                                            <TouchableOpacity 
-                                                onPress={handleUseProfileLocation}
-                                                style={{ marginTop: -10, paddingVertical: 5 }}
-                                            >
-                                                <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '600' }}>
-                                                    <MaterialCommunityIcons name="map-marker" size={12} /> Profil-Standort nutzen ({SHARED_DATA.startort})
-                                                </Text>
-                                            </TouchableOpacity>
-                                        )}
-                                    </View>
+                        <Input label="Startort" value={startLocation} onChangeText={setStartLocation} />
+                        {SHARED_DATA.isLocationEnabled && (
+                            <TouchableOpacity onPress={() => setStartLocation(SHARED_DATA.startort)} style={styles.profileLocationLink}>
+                                <Text style={styles.profileLocationText}>
+                                    <MaterialCommunityIcons name="map-marker" size={12} /> Profil-Standort nutzen
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                        <Input label="Zielort" value={destination} onChangeText={setDestination} />
                         
-                        <Input 
-                            label="Zielort" 
-                            placeholder="z.B. Berlin" 
-                            value={destination} 
-                            onChangeText={setDestination} 
-                        />
-
-                        <Input 
-                            label="Datum / Zeitraum (optional)" 
-                            placeholder="z. B. Juni 2026" 
-                            value={dateOrRange} 
-                            onChangeText={setDateOrRange} 
-                        />
-
-                        {/* Toggle für Hin- und Rückreise */}
                         <View style={styles.fieldGroup}>
-                            <Text style={styles.customLabel}>Reiseart</Text>
-                            <Button 
-                                title={roundTrip ? 'Rückreise gewünscht' : 'Nur Hinfahrt'} 
-                                variant={roundTrip ? 'primary' : 'secondary'}
-                                onPress={() => setRoundTrip(!roundTrip)}
-                            />
+                            <Text style={styles.customLabel}>Zeitraum (optional)</Text>
+                            <View style={styles.rowContainer}>
+                                <View style={styles.halfInput}>
+                                    <Input 
+                                        label="Von" 
+                                        placeholder="MM.TT"
+                                        value={dateFrom} 
+                                        onChangeText={(text) => {
+                                            const filtered = text.replace(/[^0-9.]/g, '');
+                                            setDateFrom(filtered);
+                                        }} 
+                                        keyboardType="decimal-pad"
+                                    />
+                                </View>
+                                <View style={styles.halfInput}>
+                                    <Input 
+                                        label="Bis" 
+                                        placeholder="MM.TT" 
+                                        value={dateTo} 
+                                        onChangeText={(text) => {
+                                            const filtered = text.replace(/[^0-9.]/g, '');
+                                            setDateTo(filtered);
+                                        }} 
+                                        keyboardType="decimal-pad"
+                                    />
+                                </View>
+                            </View>
                         </View>
 
-                        {/* 1. Standardbudget Switch platziert VOR Max. Budget */}
+                        <SettingRow label="Standardbudget übernehmen" value={useDefaultBudget} onValueChange={handleToggleDefaultBudget} />
+                        <Input label="Max. Budget" value={maxBudget} onChangeText={setMaxBudget} keyboardType="numeric" />
+                        
                         <SettingRow 
-                            label="Standardbudget übernehmen?" 
-                            value={useDefaultBudget} 
-                            onValueChange={handleToggleDefaultBudget} 
+                            label="Nur Direktverbindungen" 
+                            value={directOnly} 
+                            onValueChange={setDirectOnly} 
                         />
 
-                        <Input 
-                            label="Max. Budget (optional)" 
-                            placeholder="z.B. 500 EUR" 
-                            value={maxBudget} 
-                            onChangeText={(text) => {
-                                setMaxBudget(text);
-                                if (useDefaultBudget) setUseDefaultBudget(false);
-                            }}
-                            keyboardType="numeric"
-                        />
-
-                        {/* Transportmöglichkeiten mit Icons */}
                         <View style={styles.fieldGroup}>
                             <Text style={styles.customLabel}>Transportmittel</Text>
+                            <Text style={styles.infoNote}>Wenn nichts ausgewählt ist, werden alle Verkehrsmittel berücksichtigt.</Text>
                             <View style={styles.transportContainer}>
-                                {transports.map(transport => {
-                                    const isActive = selectedTransports.includes(transport) || selectedTransports.length === 0;
+                                {transports.map(t => {
+                                    const isActive = selectedTransports.includes(t);
                                     return (
-                                        <TouchableOpacity
-                                            key={transport}
-                                            style={[styles.transportOption, isActive && styles.transportOptionActive]}
-                                            onPress={() => toggleTransport(transport)}
-                                        >
-                                            <MaterialCommunityIcons 
-                                                name={transportIcons[transport]} 
-                                                size={24} 
-                                                color={isActive ? '#FFFFFF' : COLORS.primary} 
-                                            />
-                                            <Text style={[styles.transportText, isActive && styles.transportTextActive]}>
-                                                {transport}
-                                            </Text>
+                                        <TouchableOpacity key={t} style={[styles.transportOption, isActive && styles.transportOptionActive]} onPress={() => toggleTransport(t)}>
+                                            <MaterialCommunityIcons name={transportIcons[t]} size={20} color={isActive ? '#FFFFFF' : COLORS.primary} />
+                                            <Text style={[styles.transportText, isActive && styles.transportTextActive]}>{t}</Text>
                                         </TouchableOpacity>
                                     );
                                 })}
@@ -202,107 +185,100 @@ export default function SearchScreen() {
                         </View>
 
                         <View style={styles.mainActions}>
-                            <Button 
-                                title="Verbindungen suchen" 
-                                onPress={onSubmit} 
-                                variant="primary" 
-                            />
+                            <Button title="Preise im Kalender anzeigen" onPress={() => setShowCalendar(true)} variant="primary" />
                         </View>
                     </Card>
-
-                    <View style={styles.secondaryAction}>
-                        <Button 
-                            title="Zurück" 
-                            onPress={onBackPress} 
-                            variant="secondary" 
-                        />
-                    </View>
                 </ScrollView>
             )}
 
             {/* ZUSTAND 3: Kalenderansicht */}
-            {showCalendar && (
-                <View>
-                    <Header title="Günstigste Preise" subtitle="Wähle den besten Tag für deine Reise" />
+            {showCalendar && !showRouteResults && (
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <BackLink />
+                    <Header title="Preis-Kalender" subtitle={`${startLocation} ➔ ${destination}`} />
                     <Card>
-                        <Text style={styles.hintText}>Hier wird dein Preis-Kalender angezeigt.</Text>
+                        <Calendar
+                            firstDay={1}
+                            theme={{ calendarBackground: 'transparent', textSectionTitleColor: COLORS.primary, monthTextColor: COLORS.primary, arrowColor: COLORS.primary }}
+                            dayComponent={({date, state}) => {
+                                const dateString = date.dateString;
+                                const item = MOCK_CALENDAR_PRICES[dateString];
+                                const isSelected = selectedDate === dateString;
+                                return (
+                                    <TouchableOpacity onPress={() => setSelectedDate(dateString)} style={[styles.dayBox, isSelected && styles.selectedDayBox]}>
+                                        <Text style={[styles.dayText, state === 'disabled' ? {color: '#d1d5db'} : {color: COLORS.text}]}>{date.day}</Text>
+                                        {item && <Text style={[styles.priceText, { color: getPriceColor(item.level) }]}>{item.price}€</Text>}
+                                    </TouchableOpacity>
+                                );
+                            }}
+                        />
+                        <View style={styles.legendContainer}>
+                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#76943C'}]} /><Text style={styles.legendText}>Günstig</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#D4A017'}]} /><Text style={styles.legendText}>Mittel</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#A52A2A'}]} /><Text style={styles.legendText}>Teuer</Text></View>
+                        </View>
                         <View style={styles.mainActions}>
-                            <Button title="Neue Suche" variant="secondary" onPress={onBackPress} />
+                            <Button title="Tag auswählen" variant={selectedDate ? "primary" : "secondary"} onPress={() => selectedDate && setShowRouteResults(true)} />
                         </View>
                     </Card>
-                </View>
+                </ScrollView>
+            )}
+
+            {/* ZUSTAND 4: Routen-Ergebnisse (Leer gelassen für Person 3) */}
+            {showRouteResults && (
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <BackLink />
+                    <Header title={`Routen am ${selectedDate}`} subtitle={`${startLocation} ➔ ${destination}`} />
+                    
+                    {/* Dieser Bereich bleibt leer, da er von Person 3 ausgearbeitet wird */}
+                    <View style={{ flex: 1, padding: 20, alignItems: 'center' }}>
+                        <Text style={{ color: '#6b7280', fontStyle: 'italic' }}>Hier werden die Ergebnisse von Person 3 geladen</Text>
+                    </View>
+
+                    <View style={{ marginBottom: 30 }} />
+                </ScrollView>
             )}
         </PageContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    homeContainer: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    searchBar: {
-        backgroundColor: COLORS.surface || '#fff',
-        borderRadius: 12,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#d1d5db',
-        marginTop: 20,
-    },
-    placeholderText: {
-        color: '#6b7280',
-        fontSize: 16,
-    },
-    hintText: {
-        textAlign: 'center',
-        marginTop: 10,
-        color: '#6b7280',
-    },
-    fieldGroup: {
-        marginTop: 15,
-        marginBottom: 10,
-    },
-    customLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: COLORS.text || '#333',
-        marginBottom: 8,
-    },
-    transportContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        gap: 10,
-    },
-    transportOption: {
-        width: '48%',
-        backgroundColor: '#f3f4f6',
-        borderRadius: 10,
-        padding: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-    },
-    transportOptionActive: {
-        backgroundColor: COLORS.primary || '#5B5FDE',
-        borderColor: COLORS.primary || '#5B5FDE',
-    },
-    transportText: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: COLORS.text,
-    },
-    transportTextActive: {
-        color: '#fff',
-    },
-    mainActions: {
-        marginTop: 20,
-    },
-    secondaryAction: {
-        marginTop: 15,
-        marginBottom: 30,
-    }
+    homeContainer: { flex: 1, justifyContent: 'center' },
+    backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
+    backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
+    searchBar: { backgroundColor: COLORS.surface || '#fff', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#d1d5db', marginTop: 20 },
+    placeholderText: { color: '#6b7280', fontSize: 16 },
+    fieldGroup: { marginTop: 15, marginBottom: 10 },
+    customLabel: { fontSize: 14, fontWeight: '600', color: COLORS.text || '#333', marginBottom: 8 },
+    infoNote: { fontSize: 12, color: '#6b7280', marginBottom: 10, fontStyle: 'italic' },
+    rowContainer: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
+    halfInput: { flex: 1 },
+    transportContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10 },
+    transportOption: { width: '48%', backgroundColor: '#f3f4f6', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, borderWidth: 1, borderColor: '#e5e7eb' },
+    transportOptionActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+    transportText: { fontSize: 13, fontWeight: '500', color: COLORS.text },
+    transportTextActive: { color: '#fff' },
+    mainActions: { marginTop: 20 },
+    profileLocationLink: { marginTop: -10, paddingVertical: 5 },
+    profileLocationText: { color: COLORS.primary, fontSize: 12, fontWeight: '600' },
+    dayBox: { width: 45, height: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+    selectedDayBox: { borderColor: COLORS.primary, borderWidth: 2 },
+    dayText: { fontSize: 15, fontWeight: '600' },
+    priceText: { fontSize: 11, fontWeight: 'bold', marginTop: 2 },
+    legendContainer: { flexDirection: 'row', justifyContent: 'flex-start', paddingVertical: 15, gap: 15 },
+    legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    dot: { width: 12, height: 12, borderRadius: 6 },
+    legendText: { fontSize: 13, color: '#4b5563', fontWeight: '500' },
+    filterContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 15, paddingVertical: 12, borderRadius: 12, marginBottom: 5, borderWidth: 1, borderColor: '#d1d5db' },
+    filterLabel: { fontSize: 15, fontWeight: '600', color: '#1a2b48' },
+    routeCard: { marginBottom: 12, paddingVertical: 12 },
+    routeRow: { flexDirection: 'row', alignItems: 'center' },
+    iconContainer: { backgroundColor: '#e8ecf2', padding: 8, borderRadius: 10 },
+    routeInfo: { flex: 1, marginLeft: 12 },
+    routeType: { fontSize: 16, fontWeight: '700', color: '#1a2b48' },
+    routeDuration: { fontSize: 12, color: '#6b7280' },
+    routePrice: { fontSize: 18, fontWeight: 'bold', marginRight: 15 },
+    bookButton: { backgroundColor: '#63968b', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
+    bookButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+    noResultsText: { textAlign: 'center', marginTop: 20, color: '#6b7280', fontSize: 14 }
 });

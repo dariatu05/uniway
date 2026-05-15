@@ -14,18 +14,28 @@ export const MOCK_LOCATIONS = [
 
 // 2. Mock-Daten für die Kalenderpreise (30 Tage)
 // Wir simulieren Preise für verschiedene Transportmittel
-export const MOCK_CALENDAR_PRICES = [
-  { date: '2026-06-01', price: 25, transport: 'Bus', level: 'cheap' },
-  { date: '2026-06-02', price: 19, transport: 'Bus', level: 'cheap' }, // Top Deal
-  { date: '2026-06-03', price: 42, transport: 'Zug', level: 'medium' },
-  { date: '2026-06-04', price: 85, transport: 'Flug', level: 'expensive' },
-  { date: '2026-06-05', price: 30, transport: 'Auto', level: 'medium' },
-  // ... 
-];
+export const MOCK_CALENDAR_PRICES = {
+  '2026-05-01': { price: 25, level: 'cheap' },
+  '2026-05-02': { price: 19, level: 'cheap' },
+  '2026-05-03': { price: 45, level: 'medium' },
+  '2026-05-04': { price: 89, level: 'expensive' },
+  '2026-05-05': { price: 32, level: 'medium' },
+  '2026-05-06': { price: 95, level: 'expensive' },
+  '2026-05-07': { price: 22, level: 'cheap' },
+  // ... fülle hier weitere Tage für Mai 2026 auf
+};
 
 // 3. Mock-Daten für die besten Deals (z.B. Top 3)
 export const MOCK_DEALS = [
   { from: 'Wien', to: 'Prag', price: 15, transport: 'Bus' },
   { from: 'Wien', to: 'Berlin', price: 29, transport: 'Zug' },
   { from: 'Wien', to: 'Bratislava', price: 9, transport: 'Bus' }
+];
+
+// 4. Mock-Daten für die Routenvorschläge
+export const MOCK_ROUTES = [
+    { id: '1', type: 'Zug', price: 24, duration: '6 h 15 min', icon: 'train' },
+    { id: '2', type: 'Bus + Zug', price: 33, duration: '7 h 30 min', icon: 'bus-clock' },
+    { id: '3', type: 'Flugzeug', price: 85, duration: '1 h 10 min + Transfer', icon: 'airplane' },
+    { id: '4', type: 'Zug', price: 45, duration: '5 h 50 min', icon: 'train' },
 ];
