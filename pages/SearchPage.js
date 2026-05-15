@@ -21,11 +21,9 @@ import { SettingRow } from '../components/SettingRow';
 // Farben
 import { COLORS } from '../styles/colors';
 
-// Mock-Daten
+// API & Mock-Daten
+import { getProfileSettings } from '../api/storageApi';
 import { MOCK_CALENDAR_PRICES } from '../data/SearchScreenMockData';
-
-// Importiere globale Variable aus ProfilePage
-import { SHARED_DATA } from './ProfilePage';
 
 // Kalender Konfiguration
 LocaleConfig.locales['de'] = {
@@ -71,11 +69,24 @@ export default function SearchScreen() {
         }
     };
 
-    // Logik für Budget-Übernahme aus Profil
+    // Hilfsfunktion, um den Profil-Standort live zu übernehmen
+    const handleUseProfileLocation = () => {
+        const currentSettings = getProfileSettings();
+        if (currentSettings.defaultLocation) {
+            setStartLocation(currentSettings.defaultLocation);
+        }
+    };
+
+    // Hilfsfunktion, um das Standard-Budget live aus der API zu holen
     const handleToggleDefaultBudget = (value) => {
         setUseDefaultBudget(value);
-        if (value) setMaxBudget(SHARED_DATA.budget);
-        else setMaxBudget('');
+        if (value) {
+            const currentSettings = getProfileSettings();
+            // Nutzt den aktuellen Wert aus der storageApi (standardBudget)
+            setMaxBudget(currentSettings.standardBudget.toString());
+        } else {
+            setMaxBudget('');
+        }
     };
 
     // Logik für Transportmittel-Auswahl
@@ -120,13 +131,12 @@ export default function SearchScreen() {
                     <Header title="Reise suchen" subtitle="Finde die günstigste Route" />
                     <Card>
                         <Input label="Startort" value={startLocation} onChangeText={setStartLocation} />
-                        {SHARED_DATA.isLocationEnabled && (
-                            <TouchableOpacity onPress={() => setStartLocation(SHARED_DATA.startort)} style={styles.profileLocationLink}>
-                                <Text style={styles.profileLocationText}>
-                                    <MaterialCommunityIcons name="map-marker" size={12} /> Profil-Standort nutzen
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                        <TouchableOpacity onPress={handleUseProfileLocation} style={styles.profileLocationLink}>
+                            <Text style={styles.profileLocationText}>
+                                <MaterialCommunityIcons name="map-marker" size={12} /> Profil-Standort nutzen
+                            </Text>
+                        </TouchableOpacity>
+
                         <Input label="Zielort" value={destination} onChangeText={setDestination} />
                         
                         <View style={styles.fieldGroup}>
@@ -135,24 +145,18 @@ export default function SearchScreen() {
                                 <View style={styles.halfInput}>
                                     <Input 
                                         label="Von" 
-                                        placeholder="MM.TT"
+                                        placeholder="TT.MM"
                                         value={dateFrom} 
-                                        onChangeText={(text) => {
-                                            const filtered = text.replace(/[^0-9.]/g, '');
-                                            setDateFrom(filtered);
-                                        }} 
+                                        onChangeText={(text) => setDateFrom(text.replace(/[^0-9.]/g, ''))} 
                                         keyboardType="decimal-pad"
                                     />
                                 </View>
                                 <View style={styles.halfInput}>
                                     <Input 
                                         label="Bis" 
-                                        placeholder="MM.TT" 
+                                        placeholder="TT.MM" 
                                         value={dateTo} 
-                                        onChangeText={(text) => {
-                                            const filtered = text.replace(/[^0-9.]/g, '');
-                                            setDateTo(filtered);
-                                        }} 
+                                        onChangeText={(text) => setDateTo(text.replace(/[^0-9.]/g, ''))} 
                                         keyboardType="decimal-pad"
                                     />
                                 </View>
@@ -170,7 +174,7 @@ export default function SearchScreen() {
 
                         <View style={styles.fieldGroup}>
                             <Text style={styles.customLabel}>Transportmittel</Text>
-                            <Text style={styles.infoNote}>Wenn nichts ausgewählt ist, werden alle Verkehrsmittel berücksichtigt.</Text>
+                            <Text style={styles.infoNote}>Wenn nichts ausgewählt ist, werden alle übernommen.</Text>
                             <View style={styles.transportContainer}>
                                 {transports.map(t => {
                                     const isActive = selectedTransports.includes(t);
@@ -224,17 +228,14 @@ export default function SearchScreen() {
                 </ScrollView>
             )}
 
-            {/* ZUSTAND 4: Routen-Ergebnisse (Leer gelassen für Person 3) */}
+            {/* ZUSTAND 4: Ergebnisanzeige (Leer für Person 3) */}
             {showRouteResults && (
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <BackLink />
-                    <Header title={`Routen am ${selectedDate}`} subtitle={`${startLocation} ➔ ${destination}`} />
-                    
-                    {/* Dieser Bereich bleibt leer, da er von Person 3 ausgearbeitet wird */}
+                    <Header title={`Ergebnisse am ${selectedDate}`} subtitle={`${startLocation} ➔ ${destination}`} />
                     <View style={{ flex: 1, padding: 20, alignItems: 'center' }}>
                         <Text style={{ color: '#6b7280', fontStyle: 'italic' }}>Hier werden die Ergebnisse von Person 3 geladen</Text>
                     </View>
-
                     <View style={{ marginBottom: 30 }} />
                 </ScrollView>
             )}
@@ -268,17 +269,5 @@ const styles = StyleSheet.create({
     legendContainer: { flexDirection: 'row', justifyContent: 'flex-start', paddingVertical: 15, gap: 15 },
     legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     dot: { width: 12, height: 12, borderRadius: 6 },
-    legendText: { fontSize: 13, color: '#4b5563', fontWeight: '500' },
-    filterContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 15, paddingVertical: 12, borderRadius: 12, marginBottom: 5, borderWidth: 1, borderColor: '#d1d5db' },
-    filterLabel: { fontSize: 15, fontWeight: '600', color: '#1a2b48' },
-    routeCard: { marginBottom: 12, paddingVertical: 12 },
-    routeRow: { flexDirection: 'row', alignItems: 'center' },
-    iconContainer: { backgroundColor: '#e8ecf2', padding: 8, borderRadius: 10 },
-    routeInfo: { flex: 1, marginLeft: 12 },
-    routeType: { fontSize: 16, fontWeight: '700', color: '#1a2b48' },
-    routeDuration: { fontSize: 12, color: '#6b7280' },
-    routePrice: { fontSize: 18, fontWeight: 'bold', marginRight: 15 },
-    bookButton: { backgroundColor: '#63968b', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
-    bookButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-    noResultsText: { textAlign: 'center', marginTop: 20, color: '#6b7280', fontSize: 14 }
+    legendText: { fontSize: 13, color: '#4b5563', fontWeight: '500' }
 });
