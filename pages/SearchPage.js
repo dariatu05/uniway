@@ -104,6 +104,19 @@ export default function SearchScreen() {
         );
     };
 
+    const resetSearchInputs = () => {
+        setStartLocation('');
+        setDestination('');
+        setDateFrom('');
+        setDateTo('');
+        setMaxBudget('');
+        setDirectOnly(false);
+        setSelectedTransports([]);
+        setStops([]);
+        setUseDefaultBudget(false);
+        setSelectedDate('');
+    };
+
     // Hilfsfunktion für Preisfarben im Kalender
     const getPriceColor = (level) => {
         if (level === 'cheap') return '#76943C';
@@ -222,6 +235,7 @@ export default function SearchScreen() {
                         </View>
 
                         <View style={styles.mainActions}>
+                            <Button title="Zurücksetzen" onPress={resetSearchInputs} variant="secondary" />
                             <Button title="Preise im Kalender anzeigen" onPress={() => setShowCalendar(true)} variant="primary" />
                         </View>
                     </Card>
