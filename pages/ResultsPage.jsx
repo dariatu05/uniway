@@ -63,6 +63,13 @@ export default function ResultsPage({
     // null = list view; route object = detail view
     const [detailRoute, setDetailRoute] = useState(null);
 
+    const BackLink = () => (
+        <TouchableOpacity style={styles.backLink} onPress={() => onBack && onBack()}>
+            <MaterialCommunityIcons name="chevron-left" size={24} color={COLORS.primary} />
+            <Text style={styles.backLinkText}>Zurück</Text>
+        </TouchableOpacity>
+    );
+
     // ── Filter mock routes ──────────────────────────────────────────────────
     const budget = parseFloat(maxBudget) || Infinity;
 
@@ -119,6 +126,7 @@ export default function ResultsPage({
             )}
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
+                <BackLink />
                 <Text style={styles.title}>Results</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
                 {selectedDate !== '' && (
@@ -209,6 +217,8 @@ const styles = StyleSheet.create({
     headerBlock: {
         marginBottom: 14,
     },
+    backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
+    backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
     title: {
         fontSize: 30,
         fontWeight: '900',
