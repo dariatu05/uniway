@@ -19,6 +19,7 @@ Externe Libraries und Frameworks:
 - @react-navigation/native
 - @react-navigation/bottom-tabs
 - react-native-maps
+- @expo/vector-icons
 
 
 Dauer der Entwicklung:

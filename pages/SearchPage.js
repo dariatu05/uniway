@@ -52,8 +52,13 @@ export default function SearchScreen() {
     const [maxBudget, setMaxBudget] = useState('');
     const [directOnly, setDirectOnly] = useState(false);
     const [selectedTransports, setSelectedTransports] = useState([]);
+    const [stops, setStops] = useState([]);
     const [useDefaultBudget, setUseDefaultBudget] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
+
+    const addStop = () => setStops(prev => [...prev, '']);
+    const updateStop = (index, value) => setStops(prev => prev.map((item, idx) => idx === index ? value : item));
+    const removeStop = (index) => setStops(prev => prev.filter((_, idx) => idx !== index));
 
     // Transportmittel Optionen
     const transports = ['Bus', 'Zug', 'Auto', 'Flugzeug'];
@@ -142,6 +147,29 @@ export default function SearchScreen() {
                             </Text>
                         </TouchableOpacity>
 
+                        <View style={styles.fieldGroup}>
+                            <View style={styles.stopHeaderRow}>
+                                <Text style={styles.customLabel}>Zwischenstopps</Text>
+                                <TouchableOpacity onPress={addStop} activeOpacity={0.8}>
+                                    <Text style={styles.addStopText}>+ Stop hinzufügen</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.infoNote}>Optional: Füge Zwischenstopps zwischen Start und Ziel hinzu.</Text>
+                            {stops.map((stop, index) => (
+                                <View key={`stop-${index}`} style={styles.stopRow}>
+                                    <Input
+                                        label={`Zwischenstopp ${index + 1}`}
+                                        value={stop}
+                                        onChangeText={(text) => updateStop(index, text)}
+                                        placeholder="Ort eingeben"
+                                    />
+                                    <TouchableOpacity style={styles.removeStopButton} onPress={() => removeStop(index)} activeOpacity={0.8}>
+                                        <Text style={styles.removeStopText}>Entfernen</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                        </View>
+
                         <Input label="Zielort" value={destination} onChangeText={setDestination} />
 
                         <View style={styles.fieldGroup}>
@@ -204,7 +232,10 @@ export default function SearchScreen() {
             {showCalendar && !showRouteResults && (
                 <ScrollView style={styles.page} contentContainerStyle={styles.content}>
                     <BackLink />
-                    <Header title="Preis-Kalender" subtitle={`${startLocation} ➔ ${destination}`} />
+                    <Header
+                        title="Preis-Kalender"
+                        subtitle={`${startLocation || 'Start'}${stops.filter(Boolean).length > 0 ? ' → ' + stops.filter(Boolean).join(' → ') + ' → ' : ' ➔ '}${destination || 'Ziel'}`}
+                    />
                     <Card>
                         <Calendar
                             firstDay={1}
@@ -238,6 +269,7 @@ export default function SearchScreen() {
                 <ResultsPage
                     from={startLocation}
                     to={destination}
+                    stops={stops.filter(stop => stop.trim() !== '')}
                     selectedDate={selectedDate}
                     maxBudget={maxBudget}
                     selectedTransports={selectedTransports}
@@ -266,6 +298,11 @@ const styles = StyleSheet.create({
     fieldGroup: { marginTop: 15, marginBottom: 10 },
     customLabel: { fontSize: 14, fontWeight: '600', color: COLORS.text || '#333', marginBottom: 8 },
     infoNote: { fontSize: 12, color: '#6b7280', marginBottom: 10, fontStyle: 'italic' },
+    stopHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+    addStopText: { color: COLORS.primary, fontWeight: '700', fontSize: 13 },
+    stopRow: { marginBottom: 12 },
+    removeStopButton: { alignSelf: 'flex-end', marginTop: 6, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 10, backgroundColor: '#FEE2E2' },
+    removeStopText: { color: '#B91C1C', fontSize: 12, fontWeight: '700' },
     rowContainer: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
     halfInput: { flex: 1 },
     transportContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10 },
