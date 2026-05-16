@@ -61,20 +61,11 @@ export default function ResultsPage({
     onBack,
 }) {
     const [sortKey, setSortKey] = useState('cheapest');
-    // null = list view; route object = detail view
     const [detailRoute, setDetailRoute] = useState(null);
-
-    const BackLink = () => (
-        <TouchableOpacity style={styles.backLink} onPress={() => onBack && onBack()}>
-            <MaterialCommunityIcons name="chevron-left" size={24} color={COLORS.primary} />
-            <Text style={styles.backLinkText}>Zurück</Text>
-        </TouchableOpacity>
-    );
 
     // ── Filter mock routes ──────────────────────────────────────────────────
     const budget = parseFloat(maxBudget) || Infinity;
 
-    // Allowed transport types (empty selectedTransports = all allowed)
     const allowedTypes =
         selectedTransports.length === 0
             ? Object.values(TRANSPORT_MAP)
@@ -95,7 +86,6 @@ export default function ResultsPage({
     const sorted = [...ranked].sort((a, b) => {
         if (sortKey === 'cheapest') return a.price - b.price;
         if (sortKey === 'fastest') return a.durationMinutes - b.durationMinutes;
-        // 'best' — labelled best first, then by price
         if (a.label === 'best' && b.label !== 'best') return -1;
         if (b.label === 'best' && a.label !== 'best') return 1;
         return a.price - b.price;
@@ -121,7 +111,7 @@ export default function ResultsPage({
         <ScreenLayout>
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
-                <BackLink />
+                {onBack && <BackButton onPress={onBack} />}
                 <Text style={styles.title}>Results</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
                 {selectedDate !== '' && (
@@ -189,17 +179,6 @@ export default function ResultsPage({
 }
 
 const styles = StyleSheet.create({
-    backLink: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-        marginLeft: -5
-    },
-    backLinkText: {
-        color: COLORS.primary,
-        fontWeight: '600',
-        fontSize: 16
-    },
     headerBlock: {
         marginBottom: 14,
     },

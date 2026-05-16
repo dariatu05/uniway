@@ -21,6 +21,7 @@ import {
   openBookingForSegment,
 } from "../utils/bookingUtils";
 import { getLabelColor, getLabelText } from "../utils/routeRanking";
+import { ScreenLayout, BackButton } from '../components/CommonLayout';
 
 const TRANSPORT_ICONS = {
   bus: "bus",
@@ -61,18 +62,10 @@ export function RouteDetailsPage({ route, onBack }) {
   const icon = TRANSPORT_ICONS[type] || "bus";
 
   return (
-    <ScrollView ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      {/* ── Back link ── */}
-      <TouchableOpacity style={styles.backLink} onPress={onBack}>
-        <MaterialCommunityIcons
-          name="chevron-left"
-          size={24}
-          color={COLORS.primary}
-        />
-        <Text style={styles.backLinkText}>Back to Results</Text>
-      </TouchableOpacity>
-
-      {/* ── Page title ── */}
+    <ScreenLayout>
+      {/* Back link */}
+      {onBack && <BackButton onPress={onBack} />}
+      {/*  Page title */}
       <Text style={styles.pageTitle}>Route Details</Text>
       <Text style={styles.pageSubtitle}>
         {from} → {to}
@@ -234,31 +227,12 @@ export function RouteDetailsPage({ route, onBack }) {
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
-    </ScrollView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    padding: 24,
-    paddingBottom: 80,
-  },
-  backLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    marginLeft: -5,
-  },
-  backLinkText: {
-    color: COLORS.primary,
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  pageTitle: {
+   pageTitle: {
     fontSize: 28,
     fontWeight: "900",
     color: COLORS.primary,
