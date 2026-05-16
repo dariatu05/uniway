@@ -20,6 +20,7 @@ import { MOCK_ROUTES } from '../data/mockRoutes';
 import { COLORS } from '../styles/colors';
 import { rankRoutes } from '../utils/routeRanking';
 import { RouteDetailsPage } from './RouteDetailsPage';
+import { ScreenLayout, BackButton } from '../components/CommonLayout';
 
 // const SORT_OPTIONS = [
 //     { key: 'cheapest', label: '🏷️ Price' },
@@ -117,7 +118,7 @@ export default function ResultsPage({
             : `${sorted.length} result${sorted.length !== 1 ? 's' : ''} found`;
 
     return (
-        <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+        <ScreenLayout>
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
                 <BackLink />
@@ -183,20 +184,11 @@ export default function ResultsPage({
                     </Text>
                 </View>
             )}
-        </ScrollView>
+        </ScreenLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    page: {
-        flex: 1,
-        backgroundColor: COLORS.background,
-    },
-    content: {
-        padding: 24,
-        paddingBottom: 80,
-    },
-
     backLink: {
         flexDirection: 'row',
         alignItems: 'center',
