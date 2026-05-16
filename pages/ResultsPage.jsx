@@ -22,6 +22,7 @@ import { rankRoutes } from '../utils/routeRanking';
 import { RouteDetailsPage } from './RouteDetailsPage';
 import { ScreenLayout, BackButton } from '../components/CommonLayout';
 
+
 // const SORT_OPTIONS = [
 //     { key: 'cheapest', label: '🏷️ Price' },
 //     { key: 'fastest', label: '⚡ Speed' },

@@ -7,12 +7,13 @@
 // Externe Libraries
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
 // Komponenten
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { BackButton, ScreenLayout } from '../components/CommonLayout';
 import { Header } from '../components/Header';
 import { Input } from '../components/Input';
 import { PageContainer } from '../components/PageContainer';
@@ -61,8 +62,8 @@ export default function SearchScreen() {
     const removeStop = (index) => setStops(prev => prev.filter((_, idx) => idx !== index));
 
     // Transportmittel Optionen
-    const transports = ['Bus', 'Zug', 'Auto', 'Flugzeug'];
-    const transportIcons = { 'Bus': 'bus', 'Zug': 'train', 'Auto': 'car', 'Flugzeug': 'airplane' };
+    const transports = ['Bus', 'Train', 'Car', 'Plane'];
+    const transportIcons = { 'Bus': 'bus', 'Train': 'train', 'Car': 'car', 'Plane': 'airplane' };
 
     // Logik für Zurück-Button
     const onBackPress = () => {
@@ -125,73 +126,66 @@ export default function SearchScreen() {
         return '#999';
     };
 
-    // Komponente für den Zurück-Link
-    const BackLink = () => (
-        <TouchableOpacity style={styles.backLink} onPress={onBackPress}>
-            <MaterialCommunityIcons name="chevron-left" size={24} color={COLORS.primary} />
-            <Text style={styles.backLinkText}>Zurück</Text>
-        </TouchableOpacity>
-    );
 
     return (
         <View style={styles.page}>
             {/* ZUSTAND 1: Startseite */}
             {!showDetails && !showCalendar && !showRouteResults && (
                 <PageContainer>
-                <View style={styles.homeContainer}>
-                    <Header title="UniWay" subtitle="Multifunktionaler Reiseplaner für Studierende" />
-                    <TouchableOpacity style={styles.searchBar} onPress={() => setShowDetails(true)} activeOpacity={0.8}>
-                        <Text style={styles.placeholderText}>Wohin möchten Sie reisen?</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.homeContainer}>
+                        <Header title="UniWay" subtitle="Multifunctional travel planner for students" />
+                        <TouchableOpacity style={styles.searchBar} onPress={() => setShowDetails(true)} activeOpacity={0.8}>
+                            <Text style={styles.placeholderText}>Where do you want to go?</Text>
+                        </TouchableOpacity>
+                    </View>
                 </PageContainer>
             )}
 
             {/* ZUSTAND 2: Detaillierte Suche */}
             {showDetails && !showCalendar && !showRouteResults && (
-                <ScrollView ScrollView style={styles.page} contentContainerStyle={styles.content}>
-                    <BackLink />
-                    <Header title="Reise suchen" subtitle="Finde die günstigste Route" />
+                <ScreenLayout>
+                    <BackButton onPress={onBackPress} />
+                    <Header title="Search Trip" subtitle="Find the cheapest route" />
                     <Card>
-                        <Input label="Startort" value={startLocation} onChangeText={setStartLocation} />
+                        <Input label="Start location" value={startLocation} onChangeText={setStartLocation} />
                         <TouchableOpacity onPress={handleUseProfileLocation} style={styles.profileLocationLink}>
                             <Text style={styles.profileLocationText}>
-                                <MaterialCommunityIcons name="map-marker" size={12} /> Profil-Standort nutzen
+                                <MaterialCommunityIcons name="map-marker" size={12} /> Use profile location
                             </Text>
                         </TouchableOpacity>
 
                         <View style={styles.fieldGroup}>
                             <View style={styles.stopHeaderRow}>
-                                <Text style={styles.customLabel}>Zwischenstopps</Text>
+                                <Text style={styles.customLabel}>Stopovers</Text>
                                 <TouchableOpacity onPress={addStop} activeOpacity={0.8}>
-                                    <Text style={styles.addStopText}>+ Stop hinzufügen</Text>
+                                    <Text style={styles.addStopText}>+ Add stopover</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.infoNote}>Optional: Füge Zwischenstopps zwischen Start und Ziel hinzu.</Text>
+                            <Text style={styles.infoNote}>Optional: Add stopovers between start and destination.</Text>
                             {stops.map((stop, index) => (
                                 <View key={`stop-${index}`} style={styles.stopRow}>
                                     <Input
-                                        label={`Zwischenstopp ${index + 1}`}
+                                        label={`Stopover ${index + 1}`}
                                         value={stop}
                                         onChangeText={(text) => updateStop(index, text)}
-                                        placeholder="Ort eingeben"
+                                        placeholder="Enter location"
                                     />
                                     <TouchableOpacity style={styles.removeStopButton} onPress={() => removeStop(index)} activeOpacity={0.8}>
-                                        <Text style={styles.removeStopText}>Entfernen</Text>
+                                        <Text style={styles.removeStopText}>Remove</Text>
                                     </TouchableOpacity>
                                 </View>
                             ))}
                         </View>
 
-                        <Input label="Zielort" value={destination} onChangeText={setDestination} />
+                        <Input label="Destination" value={destination} onChangeText={setDestination} />
 
                         <View style={styles.fieldGroup}>
-                            <Text style={styles.customLabel}>Zeitraum (optional)</Text>
+                            <Text style={styles.customLabel}>Time period (optional)</Text>
                             <View style={styles.rowContainer}>
                                 <View style={styles.halfInput}>
                                     <Input
-                                        label="Von"
-                                        placeholder="TT.MM"
+                                        label="From"
+                                        placeholder="DD.MM"
                                         value={dateFrom}
                                         onChangeText={(text) => setDateFrom(text.replace(/[^0-9.]/g, ''))}
                                         keyboardType="decimal-pad"
@@ -199,8 +193,8 @@ export default function SearchScreen() {
                                 </View>
                                 <View style={styles.halfInput}>
                                     <Input
-                                        label="Bis"
-                                        placeholder="TT.MM"
+                                        label="To"
+                                        placeholder="DD.MM"
                                         value={dateTo}
                                         onChangeText={(text) => setDateTo(text.replace(/[^0-9.]/g, ''))}
                                         keyboardType="decimal-pad"
@@ -209,18 +203,18 @@ export default function SearchScreen() {
                             </View>
                         </View>
 
-                        <SettingRow label="Standardbudget übernehmen" value={useDefaultBudget} onValueChange={handleToggleDefaultBudget} />
+                        <SettingRow label="Use default budget" value={useDefaultBudget} onValueChange={handleToggleDefaultBudget} />
                         <Input label="Max. Budget" value={maxBudget} onChangeText={setMaxBudget} keyboardType="numeric" />
 
                         <SettingRow
-                            label="Nur Direktverbindungen"
+                            label="Direct connections only"
                             value={directOnly}
                             onValueChange={setDirectOnly}
                         />
 
                         <View style={styles.fieldGroup}>
-                            <Text style={styles.customLabel}>Transportmittel</Text>
-                            <Text style={styles.infoNote}>Wenn nichts ausgewählt ist, werden alle übernommen.</Text>
+                            <Text style={styles.customLabel}>Type of transport</Text>
+                            <Text style={styles.infoNote}>If none are selected, all transport types will be included.</Text>
                             <View style={styles.transportContainer}>
                                 {transports.map(t => {
                                     const isActive = selectedTransports.includes(t);
@@ -235,20 +229,20 @@ export default function SearchScreen() {
                         </View>
 
                         <View style={styles.mainActions}>
-                            <Button title="Zurücksetzen" onPress={resetSearchInputs} variant="secondary" />
-                            <Button title="Preise im Kalender anzeigen" onPress={() => setShowCalendar(true)} variant="primary" />
+                            <Button title="Reset" onPress={resetSearchInputs} variant="secondary" />
+                            <Button title="Show prices in calendar" onPress={() => setShowCalendar(true)} variant="primary" />
                         </View>
                     </Card>
-                </ScrollView>
+                </ScreenLayout>
             )}
 
             {/* ZUSTAND 3: Kalenderansicht */}
             {showCalendar && !showRouteResults && (
-                <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-                    <BackLink />
+                <ScreenLayout>
+                    <BackButton onPress={onBackPress} />
                     <Header
-                        title="Preis-Kalender"
-                        subtitle={`${startLocation || 'Start'}${stops.filter(Boolean).length > 0 ? ' → ' + stops.filter(Boolean).join(' → ') + ' → ' : ' ➔ '}${destination || 'Ziel'}`}
+                        title="Price Calendar"
+                        subtitle={`${startLocation || 'Start'}${stops.filter(Boolean).length > 0 ? ' → ' + stops.filter(Boolean).join(' → ') + ' → ' : ' ➔ '}${destination || 'Destination'}`}
                     />
                     <Card>
                         <Calendar
@@ -267,15 +261,15 @@ export default function SearchScreen() {
                             }}
                         />
                         <View style={styles.legendContainer}>
-                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#76943C' }]} /><Text style={styles.legendText}>Günstig</Text></View>
-                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#D4A017' }]} /><Text style={styles.legendText}>Mittel</Text></View>
-                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#A52A2A' }]} /><Text style={styles.legendText}>Teuer</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#76943C' }]} /><Text style={styles.legendText}>Cheap</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#D4A017' }]} /><Text style={styles.legendText}>Average</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#A52A2A' }]} /><Text style={styles.legendText}>Expensive</Text></View>
                         </View>
                         <View style={styles.mainActions}>
-                            <Button title="Tag auswählen" variant={selectedDate ? "primary" : "secondary"} onPress={() => selectedDate && setShowRouteResults(true)} />
+                            <Button title="Select date" variant={selectedDate ? "primary" : "secondary"} onPress={() => selectedDate && setShowRouteResults(true)} />
                         </View>
                     </Card>
-                </ScrollView>
+                </ScreenLayout>
             )}
 
             {/* ZUSTAND 4: Ergebnisanzeige (Person 3) */}
@@ -300,13 +294,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    content: {
-        padding: 24,
-        paddingBottom: 80,
-    },
     homeContainer: { flex: 1, justifyContent: 'center' },
-    backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
-    backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
     searchBar: { backgroundColor: COLORS.surface || '#fff', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#d1d5db', marginTop: 20 },
     placeholderText: { color: '#6b7280', fontSize: 16 },
     fieldGroup: { marginTop: 15, marginBottom: 10 },
