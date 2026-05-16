@@ -7,18 +7,18 @@
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { LikeRouteButton } from "../components/LikeRouteButton";
 import { COLORS } from "../styles/colors";
 import {
-    openBookingForRoute,
-    openBookingForSegment,
+  openBookingForRoute,
+  openBookingForSegment,
 } from "../utils/bookingUtils";
 import { getLabelColor, getLabelText } from "../utils/routeRanking";
 
@@ -61,7 +61,7 @@ export function RouteDetailsPage({ route, onBack }) {
   const icon = TRANSPORT_ICONS[type] || "bus";
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
+    <ScrollView ScrollView style={styles.page} contentContainerStyle={styles.content}>
       {/* ── Back link ── */}
       <TouchableOpacity style={styles.backLink} onPress={onBack}>
         <MaterialCommunityIcons
@@ -239,7 +239,14 @@ export function RouteDetailsPage({ route, onBack }) {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1 },
+  page: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  content: {
+    padding: 24,
+    paddingBottom: 80,
+  },
   backLink: {
     flexDirection: "row",
     alignItems: "center",
