@@ -24,7 +24,7 @@ import { COLORS } from '../styles/colors';
 
 // API & Mock-Daten
 import { getProfileSettings } from '../api/storageApi';
-import { MOCK_CALENDAR_PRICES } from '../data/SearchScreenMockData';
+import { MOCK_CALENDAR_PRICES } from '../data/mockSearch';
 
 // Person 3 — Ergebnisliste
 import ResultsPage from './ResultsPage';
