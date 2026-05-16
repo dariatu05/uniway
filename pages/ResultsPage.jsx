@@ -28,9 +28,9 @@ import { RouteDetailsPage } from './RouteDetailsPage';
 // ];
 
 const SORT_OPTIONS = [
-    { key: 'cheapest', label: ' Price', icon: 'tag' },          
-    { key: 'fastest', label: ' Speed', icon: 'flash' },       
-    { key: 'best', label: ' Best', icon: 'crown' },            
+    { key: 'cheapest', label: ' Price', icon: 'tag' },
+    { key: 'fastest', label: ' Speed', icon: 'flash' },
+    { key: 'best', label: ' Best', icon: 'crown' },
 ];
 
 const TRANSPORT_MAP = {
@@ -118,12 +118,6 @@ export default function ResultsPage({
 
     return (
         <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-            {onBack && (
-                <TouchableOpacity style={styles.backLink} onPress={onBack}>
-                    <MaterialCommunityIcons name="chevron-left" size={28} color={COLORS.primary} />
-                    <Text style={styles.backLinkText}>Zurück</Text>
-                </TouchableOpacity>
-            )}
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
                 <BackLink />
