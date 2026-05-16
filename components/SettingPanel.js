@@ -1,5 +1,5 @@
 import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
-import { COLORS } from "../styles/colors";
+import { COLORS } from "../../styles/colors";
 
 export default function SettingsPanel({ settings, onChange }) {
   function updateField(field, value) {
@@ -94,7 +94,7 @@ export default function SettingsPanel({ settings, onChange }) {
       />
 
       <Checkbox
-        label="Cheapest Route First standardmäßig aktivieren"
+        label="Cheapest Route First aktivieren"
         checked={settings.cheapestRouteFirst}
         onChange={(value) => updateField("cheapestRouteFirst", value)}
       />

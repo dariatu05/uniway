@@ -1,33 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 
-import { getProfileSettings, saveProfileSettings } from "../api/storageApi";
+import { deleteFavoriteRoute, getFavoriteRoutes } from "../api/storageApi";
 
-import ProfileHeader from "../components/profile/ProfileHeader";
-import SettingsPanel from "../components/profile/SettingsPanel";
+import EmptyFavorites from "../components/favorites/EmptyFavorites";
+import FavoriteRouteCard from "../components/favorites/FavoriteRouteCard";
 import { COLORS } from "../styles/colors";
 
-export default function ProfilePage() {
-  const [settings, setSettings] = useState(() => getProfileSettings());
+export default function FavoritesPage() {
+  const [favorites, setFavorites] = useState(() => getFavoriteRoutes());
 
-  useEffect(() => {
-    saveProfileSettings(settings);
-  }, [settings]);
+  function handleDelete(routeId) {
+    const updatedFavorites = deleteFavoriteRoute(routeId);
+    setFavorites(updatedFavorites);
+  }
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Profil</Text>
+      <Text style={styles.title}>Favoriten</Text>
 
       <Text style={styles.subtitle}>
-        Verwalte Standort, Budget und App-Einstellungen.
+        Hier findest du deine gespeicherten Routen.
       </Text>
 
-      <ProfileHeader
-        name={settings.name}
-        defaultLocation={settings.defaultLocation}
-      />
-
-      <SettingsPanel settings={settings} onChange={setSettings} />
+      {favorites.length === 0 ? (
+        <EmptyFavorites />
+      ) : (
+        favorites.map((route) => (
+          <FavoriteRouteCard
+            key={route.id}
+            route={route}
+            onDelete={handleDelete}
+          />
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -38,11 +44,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   content: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 80,
   },
   title: {
-    color: COLORS.primary,
+    color: COLORS.text,
     fontSize: 30,
     fontWeight: "900",
     marginBottom: 6,

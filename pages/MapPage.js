@@ -73,7 +73,9 @@ function getSelectedOption(selectedTransport) {
 export default function MapPage() {
   const [selectedTransport, setSelectedTransport] = useState("all");
 
-  const selectedOption = getSelectedOption(selectedTransport);
+  const selectedOption = useMemo(() => {
+    return getSelectedOption(selectedTransport);
+  }, [selectedTransport]);
 
   const routePoints = useMemo(() => {
     if (!selectedOption) return [];
@@ -85,20 +87,32 @@ export default function MapPage() {
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Map</Text>
-      <Text style={styles.subtitle}>
-        Wähle ein Verkehrsmittel oder lasse „Alle“ aktiv.
-      </Text>
+      <View style={styles.headerCard}>
+        <Text style={styles.pageLabel}>UniWay Map</Text>
+        <Text style={styles.title}>Reiseroute ansehen</Text>
+        <Text style={styles.subtitle}>
+          Wähle ein Verkehrsmittel. Bei „Alle“ wird automatisch die günstigste
+          Option angezeigt.
+        </Text>
+      </View>
 
-      <MapTransportFilter
-        selectedTransport={selectedTransport}
-        onChange={setSelectedTransport}
-      />
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Verkehrsmittel</Text>
+
+        <MapTransportFilter
+          selectedTransport={selectedTransport}
+          onChange={setSelectedTransport}
+        />
+      </View>
 
       <MapPriceBox option={selectedOption} />
 
-      <View style={styles.mapWrapper}>
-        <RouteMap points={routePoints} center={center} polyline={polyline} />
+      <View style={styles.mapSection}>
+        <Text style={styles.sectionTitle}>Karte</Text>
+
+        <View style={styles.mapWrapper}>
+          <RouteMap points={routePoints} center={center} polyline={polyline} />
+        </View>
       </View>
     </ScrollView>
   );
@@ -113,18 +127,47 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: COLORS.text,
+  headerCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  pageLabel: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: "900",
     marginBottom: 6,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: COLORS.text,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
     color: "#64748b",
-    marginBottom: 16,
+    lineHeight: 21,
+  },
+  section: {
+    marginBottom: 4,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: COLORS.text,
+    marginBottom: 10,
+  },
+  mapSection: {
+    marginTop: 4,
   },
   mapWrapper: {
-    marginTop: 16,
+    borderRadius: 24,
+    overflow: "hidden",
   },
 });
