@@ -6,10 +6,10 @@ import ButtonSearch from "../assets/images/buttons/ButtonSearch.png";
 import ButtonTrain from "../assets/images/buttons/ButtonTrain.png";
 
 const icons = {
-  Suche: ButtonSearch,
+  Search: ButtonSearch,
   Map: ButtonTrain,
-  Favoriten: ButtonHeart,
-  Profil: ButtonPerson,
+  Favorites: ButtonHeart,
+  Profile: ButtonPerson,
 };
 
 export default function TabBarIcon({ routeName, focused }) {

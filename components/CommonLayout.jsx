@@ -2,7 +2,6 @@
 // Location: src/components/CommonLayout.jsx
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { COLORS } from "../styles/colors";
 
@@ -11,9 +10,9 @@ import { COLORS } from "../styles/colors";
  */
 export function ScreenLayout({ children, contentStyle, ...props }) {
     return (
-        <ScrollView 
-            style={styles.page} 
-            contentContainerStyle={[styles.content, contentStyle]} 
+        <ScrollView
+            style={styles.page}
+            contentContainerStyle={[styles.content, contentStyle]}
             showsVerticalScrollIndicator={false}
             {...props}
         >
@@ -25,7 +24,7 @@ export function ScreenLayout({ children, contentStyle, ...props }) {
 /**
  * Universelle Zurück-Schaltfläche mit Icon, die in allen Seiten verwendet werden kann.
  */
-export function BackButton({ onPress, title = "Zurück" }) {
+export function BackButton({ onPress, title = "Back" }) {
     return (
         <TouchableOpacity style={styles.backLink} onPress={onPress} activeOpacity={0.7}>
             <MaterialCommunityIcons

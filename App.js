@@ -61,10 +61,10 @@ export default function App() {
             headerTintColor: COLORS.surface,
           })}
         >
-          <Tab.Screen name="Suche" component={SearchPage} />
+          <Tab.Screen name="Search" component={SearchPage} />
           {/* <Tab.Screen name="Map" component={MapPage} /> */}
-          <Tab.Screen name="Favoriten" component={FavoritesPage} />
-          <Tab.Screen name="Profil" component={ProfilePage} />
+          <Tab.Screen name="Favorites" component={FavoritesPage} />
+          <Tab.Screen name="Profile" component={ProfilePage} />
         </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
