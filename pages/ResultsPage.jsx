@@ -21,10 +21,16 @@ import { COLORS } from '../styles/colors';
 import { rankRoutes } from '../utils/routeRanking';
 import { RouteDetailsPage } from './RouteDetailsPage';
 
+// const SORT_OPTIONS = [
+//     { key: 'cheapest', label: '🏷️ Price' },
+//     { key: 'fastest', label: '⚡ Speed' },
+//     { key: 'best', label: '⭐ Best' },
+// ];
+
 const SORT_OPTIONS = [
-    { key: 'cheapest', label: '🏷️ Price' },
-    { key: 'fastest', label: '⚡ Speed' },
-    { key: 'best', label: '⭐ Best' },
+    { key: 'cheapest', label: ' Price', icon: 'tag' },          
+    { key: 'fastest', label: ' Speed', icon: 'flash' },       
+    { key: 'best', label: ' Best', icon: 'crown' },            
 ];
 
 const TRANSPORT_MAP = {
@@ -133,6 +139,12 @@ export default function ResultsPage({
                             ]}
                             onPress={() => setSortKey(opt.key)}
                         >
+                            <MaterialCommunityIcons
+                                name={opt.icon}
+                                size={16}
+                                color={COLORS.secondary}
+                                style={styles.sortIcon}
+                            />
                             <Text
                                 style={[
                                     styles.sortButtonText,
@@ -237,6 +249,8 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
         borderWidth: 1,
         borderColor: '#e5e7eb',
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     sortButtonActive: {
         backgroundColor: COLORS.primary,
