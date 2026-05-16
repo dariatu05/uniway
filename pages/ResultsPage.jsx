@@ -5,6 +5,7 @@
 // Receives search params as props — no React Navigation needed here.
 // If your team later adds a separate /results route, it also works via navigation params.
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
     FlatList,
@@ -13,13 +14,12 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { RouteCard } from '../components/RouteCard';
-import { RouteDetailsPage } from './RouteDetailsPage';
-import { COLORS } from '../styles/colors';
 import { MOCK_ROUTES } from '../data/mockRoutes';
+import { COLORS } from '../styles/colors';
 import { rankRoutes } from '../utils/routeRanking';
+import { RouteDetailsPage } from './RouteDetailsPage';
 
 const SORT_OPTIONS = [
     { key: 'cheapest', label: '🏷️ Price' },
@@ -56,6 +56,13 @@ export default function ResultsPage({
     const [sortKey, setSortKey] = useState('cheapest');
     // null = list view; route object = detail view
     const [detailRoute, setDetailRoute] = useState(null);
+
+    const BackLink = () => (
+        <TouchableOpacity style={styles.backLink} onPress={() => onBack && onBack()}>
+            <MaterialCommunityIcons name="chevron-left" size={24} color={COLORS.primary} />
+            <Text style={styles.backLinkText}>Zurück</Text>
+        </TouchableOpacity>
+    );
 
     // ── Filter mock routes ──────────────────────────────────────────────────
     const budget = parseFloat(maxBudget) || Infinity;
@@ -107,6 +114,7 @@ export default function ResultsPage({
         <View style={styles.container}>
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
+                <BackLink />
                 <Text style={styles.title}>Results</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
                 {selectedDate !== '' && (
@@ -179,6 +187,8 @@ const styles = StyleSheet.create({
     headerBlock: {
         marginBottom: 14,
     },
+    backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
+    backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
     title: {
         fontSize: 28,
         fontWeight: '900',
