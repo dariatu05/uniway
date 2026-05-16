@@ -8,11 +8,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-    FlatList,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 import { RouteCard } from '../components/RouteCard';
@@ -23,14 +23,14 @@ import { RouteDetailsPage } from './RouteDetailsPage';
 
 const SORT_OPTIONS = [
     { key: 'cheapest', label: '🏷️ Price' },
-    { key: 'fastest',  label: '⚡ Speed' },
-    { key: 'best',     label: '⭐ Best'  },
+    { key: 'fastest', label: '⚡ Speed' },
+    { key: 'best', label: '⭐ Best' },
 ];
 
 const TRANSPORT_MAP = {
-    'Bus':      'bus',
-    'Zug':      'train',
-    'Auto':     'car',
+    'Bus': 'bus',
+    'Zug': 'train',
+    'Auto': 'car',
     'Flugzeug': 'plane',
 };
 
@@ -75,10 +75,10 @@ export default function ResultsPage({
 
     const filtered = MOCK_ROUTES.filter(r => {
         const fromMatch = from.trim() === '' || r.from.toLowerCase().includes(from.toLowerCase());
-        const toMatch   = to.trim()   === '' || r.to.toLowerCase().includes(to.toLowerCase());
+        const toMatch = to.trim() === '' || r.to.toLowerCase().includes(to.toLowerCase());
         const typeMatch = allowedTypes.includes(r.type);
-        const budgetOk  = r.price <= budget;
-        const directOk  = !directOnly || r.transfers === 0;
+        const budgetOk = r.price <= budget;
+        const directOk = !directOnly || r.transfers === 0;
         return fromMatch && toMatch && typeMatch && budgetOk && directOk;
     });
 
@@ -87,10 +87,10 @@ export default function ResultsPage({
 
     const sorted = [...ranked].sort((a, b) => {
         if (sortKey === 'cheapest') return a.price - b.price;
-        if (sortKey === 'fastest')  return a.durationMinutes - b.durationMinutes;
+        if (sortKey === 'fastest') return a.durationMinutes - b.durationMinutes;
         // 'best' — labelled best first, then by price
         if (a.label === 'best' && b.label !== 'best') return -1;
-        if (b.label === 'best' && a.label !== 'best') return  1;
+        if (b.label === 'best' && a.label !== 'best') return 1;
         return a.price - b.price;
     });
 
@@ -111,7 +111,13 @@ export default function ResultsPage({
             : `${sorted.length} result${sorted.length !== 1 ? 's' : ''} found`;
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+            {onBack && (
+                <TouchableOpacity style={styles.backLink} onPress={onBack}>
+                    <MaterialCommunityIcons name="chevron-left" size={28} color={COLORS.primary} />
+                    <Text style={styles.backLinkText}>Zurück</Text>
+                </TouchableOpacity>
+            )}
             {/* ── Header ── */}
             <View style={styles.headerBlock}>
                 <BackLink />
@@ -150,18 +156,13 @@ export default function ResultsPage({
 
             {/* ── Route list / empty state ── */}
             {sorted.length > 0 ? (
-                <FlatList
-                    data={sorted}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => (
-                        <RouteCard
-                            route={item}
-                            onPress={() => setDetailRoute(item)}
-                        />
-                    )}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.listContent}
-                />
+                sorted.map((item) => (
+                    <RouteCard
+                        key={item.id}
+                        route={item}
+                        onPress={() => setDetailRoute(item)}
+                    />
+                ))
             ) : (
                 <View style={styles.emptyState}>
                     <MaterialCommunityIcons
@@ -176,13 +177,30 @@ export default function ResultsPage({
                     </Text>
                 </View>
             )}
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    page: {
         flex: 1,
+        backgroundColor: COLORS.background,
+    },
+    content: {
+        padding: 24,
+        paddingBottom: 80,
+    },
+
+    backLink: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        marginLeft: -5
+    },
+    backLinkText: {
+        color: COLORS.primary,
+        fontWeight: '600',
+        fontSize: 16
     },
     headerBlock: {
         marginBottom: 14,
@@ -190,7 +208,7 @@ const styles = StyleSheet.create({
     backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
     backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
     title: {
-        fontSize: 28,
+        fontSize: 30,
         fontWeight: '900',
         color: COLORS.primary,
     },

@@ -30,10 +30,10 @@ import ResultsPage from './ResultsPage';
 
 // Kalender Konfiguration
 LocaleConfig.locales['de'] = {
-    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-    monthNamesShort: ['Jan.','Feb.','Mrz.','Apr.','Mai','Jun.','Jul.','Aug.','Sept.','Okt.','Nov.','Dez.'],
-    dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-    dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+    monthNames: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+    monthNamesShort: ['Jan.', 'Feb.', 'Mrz.', 'Apr.', 'Mai', 'Jun.', 'Jul.', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'],
+    dayNames: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+    dayNamesShort: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
     today: 'Heute'
 };
 LocaleConfig.defaultLocale = 'de';
@@ -41,14 +41,14 @@ LocaleConfig.defaultLocale = 'de';
 export default function SearchScreen() {
     // Zustandssteuerung
     const [showDetails, setShowDetails] = useState(false);
-    const [showCalendar, setShowCalendar] = useState(false); 
+    const [showCalendar, setShowCalendar] = useState(false);
     const [showRouteResults, setShowRouteResults] = useState(false);
 
     // Speicher für Suchparameter
     const [startLocation, setStartLocation] = useState('');
     const [destination, setDestination] = useState('');
-    const [dateFrom, setDateFrom] = useState(''); 
-    const [dateTo, setDateTo] = useState('');     
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
     const [maxBudget, setMaxBudget] = useState('');
     const [directOnly, setDirectOnly] = useState(false);
     const [selectedTransports, setSelectedTransports] = useState([]);
@@ -101,9 +101,9 @@ export default function SearchScreen() {
 
     // Hilfsfunktion für Preisfarben im Kalender
     const getPriceColor = (level) => {
-        if (level === 'cheap') return '#76943C'; 
-        if (level === 'medium') return '#D4A017'; 
-        if (level === 'expensive') return '#A52A2A'; 
+        if (level === 'cheap') return '#76943C';
+        if (level === 'medium') return '#D4A017';
+        if (level === 'expensive') return '#A52A2A';
         return '#999';
     };
 
@@ -116,20 +116,22 @@ export default function SearchScreen() {
     );
 
     return (
-        <PageContainer>
+        <View style={styles.page}>
             {/* ZUSTAND 1: Startseite */}
             {!showDetails && !showCalendar && !showRouteResults && (
+                <PageContainer>
                 <View style={styles.homeContainer}>
                     <Header title="UniWay" subtitle="Multifunktionaler Reiseplaner für Studierende" />
                     <TouchableOpacity style={styles.searchBar} onPress={() => setShowDetails(true)} activeOpacity={0.8}>
                         <Text style={styles.placeholderText}>Wohin möchten Sie reisen?</Text>
                     </TouchableOpacity>
                 </View>
+                </PageContainer>
             )}
 
             {/* ZUSTAND 2: Detaillierte Suche */}
             {showDetails && !showCalendar && !showRouteResults && (
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView ScrollView style={styles.page} contentContainerStyle={styles.content}>
                     <BackLink />
                     <Header title="Reise suchen" subtitle="Finde die günstigste Route" />
                     <Card>
@@ -141,25 +143,25 @@ export default function SearchScreen() {
                         </TouchableOpacity>
 
                         <Input label="Zielort" value={destination} onChangeText={setDestination} />
-                        
+
                         <View style={styles.fieldGroup}>
                             <Text style={styles.customLabel}>Zeitraum (optional)</Text>
                             <View style={styles.rowContainer}>
                                 <View style={styles.halfInput}>
-                                    <Input 
-                                        label="Von" 
+                                    <Input
+                                        label="Von"
                                         placeholder="TT.MM"
-                                        value={dateFrom} 
-                                        onChangeText={(text) => setDateFrom(text.replace(/[^0-9.]/g, ''))} 
+                                        value={dateFrom}
+                                        onChangeText={(text) => setDateFrom(text.replace(/[^0-9.]/g, ''))}
                                         keyboardType="decimal-pad"
                                     />
                                 </View>
                                 <View style={styles.halfInput}>
-                                    <Input 
-                                        label="Bis" 
-                                        placeholder="TT.MM" 
-                                        value={dateTo} 
-                                        onChangeText={(text) => setDateTo(text.replace(/[^0-9.]/g, ''))} 
+                                    <Input
+                                        label="Bis"
+                                        placeholder="TT.MM"
+                                        value={dateTo}
+                                        onChangeText={(text) => setDateTo(text.replace(/[^0-9.]/g, ''))}
                                         keyboardType="decimal-pad"
                                     />
                                 </View>
@@ -168,11 +170,11 @@ export default function SearchScreen() {
 
                         <SettingRow label="Standardbudget übernehmen" value={useDefaultBudget} onValueChange={handleToggleDefaultBudget} />
                         <Input label="Max. Budget" value={maxBudget} onChangeText={setMaxBudget} keyboardType="numeric" />
-                        
-                        <SettingRow 
-                            label="Nur Direktverbindungen" 
-                            value={directOnly} 
-                            onValueChange={setDirectOnly} 
+
+                        <SettingRow
+                            label="Nur Direktverbindungen"
+                            value={directOnly}
+                            onValueChange={setDirectOnly}
                         />
 
                         <View style={styles.fieldGroup}>
@@ -200,29 +202,29 @@ export default function SearchScreen() {
 
             {/* ZUSTAND 3: Kalenderansicht */}
             {showCalendar && !showRouteResults && (
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView style={styles.page} contentContainerStyle={styles.content}>
                     <BackLink />
                     <Header title="Preis-Kalender" subtitle={`${startLocation} ➔ ${destination}`} />
                     <Card>
                         <Calendar
                             firstDay={1}
                             theme={{ calendarBackground: 'transparent', textSectionTitleColor: COLORS.primary, monthTextColor: COLORS.primary, arrowColor: COLORS.primary }}
-                            dayComponent={({date, state}) => {
+                            dayComponent={({ date, state }) => {
                                 const dateString = date.dateString;
                                 const item = MOCK_CALENDAR_PRICES[dateString];
                                 const isSelected = selectedDate === dateString;
                                 return (
                                     <TouchableOpacity onPress={() => setSelectedDate(dateString)} style={[styles.dayBox, isSelected && styles.selectedDayBox]}>
-                                        <Text style={[styles.dayText, state === 'disabled' ? {color: '#d1d5db'} : {color: COLORS.text}]}>{date.day}</Text>
+                                        <Text style={[styles.dayText, state === 'disabled' ? { color: '#d1d5db' } : { color: COLORS.text }]}>{date.day}</Text>
                                         {item && <Text style={[styles.priceText, { color: getPriceColor(item.level) }]}>{item.price}€</Text>}
                                     </TouchableOpacity>
                                 );
                             }}
                         />
                         <View style={styles.legendContainer}>
-                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#76943C'}]} /><Text style={styles.legendText}>Günstig</Text></View>
-                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#D4A017'}]} /><Text style={styles.legendText}>Mittel</Text></View>
-                            <View style={styles.legendItem}><View style={[styles.dot, {backgroundColor: '#A52A2A'}]} /><Text style={styles.legendText}>Teuer</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#76943C' }]} /><Text style={styles.legendText}>Günstig</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#D4A017' }]} /><Text style={styles.legendText}>Mittel</Text></View>
+                            <View style={styles.legendItem}><View style={[styles.dot, { backgroundColor: '#A52A2A' }]} /><Text style={styles.legendText}>Teuer</Text></View>
                         </View>
                         <View style={styles.mainActions}>
                             <Button title="Tag auswählen" variant={selectedDate ? "primary" : "secondary"} onPress={() => selectedDate && setShowRouteResults(true)} />
@@ -243,11 +245,19 @@ export default function SearchScreen() {
                     onBack={onBackPress}
                 />
             )}
-        </PageContainer>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    page: {
+        flex: 1,
+        backgroundColor: COLORS.background,
+    },
+    content: {
+        padding: 24,
+        paddingBottom: 80,
+    },
     homeContainer: { flex: 1, justifyContent: 'center' },
     backLink: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: -5 },
     backLinkText: { color: COLORS.primary, fontWeight: '600', fontSize: 16 },
