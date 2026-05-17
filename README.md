@@ -29,7 +29,6 @@ Externe Libraries und Frameworks:
 
 
 Dauer der Entwicklung:
-[XX Stunden]
+76,5 Stunden (Daria: 18h, Rufina: 18.5h, Mariia: 20h, Mariana: 20h)
 
 Weitere Anmerkungen:
-[...]
