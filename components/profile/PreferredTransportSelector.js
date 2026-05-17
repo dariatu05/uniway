@@ -1,10 +1,10 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS } from "../../styles/colors";
 const transports = [
-  { value: "car", label: "Auto" },
-  { value: "train", label: "Zug" },
+  { value: "car", label: "Car" },
+  { value: "train", label: "Train" },
   { value: "bus", label: "Bus" },
-  { value: "plane", label: "Flugzeug" },
+  { value: "plane", label: "Plane" },
 ];
 
 export default function PreferredTransportSelector({

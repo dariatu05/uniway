@@ -12,7 +12,7 @@ export default function ProfileHeader({ name, defaultLocation }) {
       <Text style={styles.name}>{name}</Text>
 
       <Text style={styles.location}>
-        Standard-Startort: {defaultLocation || "Nicht festgelegt"}
+        Default Location: {defaultLocation || "Not set"}
       </Text>
     </View>
   );

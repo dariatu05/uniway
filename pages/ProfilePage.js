@@ -16,10 +16,10 @@ export default function ProfilePage() {
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Profil</Text>
+      <Text style={styles.title}>Profile</Text>
 
       <Text style={styles.subtitle}>
-        Verwalte Standort, Budget und App-Einstellungen.
+        Manage location, budget and app settings.
       </Text>
 
       <ProfileHeader

@@ -14,9 +14,9 @@ export default function SettingsPanel({ settings, onChange }) {
 
   return (
     <View style={styles.panel}>
-      <Text style={styles.title}>Einstellungen</Text>
+      <Text style={styles.title}>Settings</Text>
 
-      <SettingRow label="Name" description="Anzeigename im Profil">
+      <SettingRow label="Name" description="Display name in profile">
         <TextInput
           value={settings.name}
           onChangeText={(value) => updateField("name", value)}
@@ -25,8 +25,8 @@ export default function SettingsPanel({ settings, onChange }) {
       </SettingRow>
 
       <SettingRow
-        label="Standard-Startort"
-        description="Wird genutzt, wenn kein Standort freigegeben ist"
+        label="Default Location"
+        description="Used when no location is shared"
       >
         <TextInput
           value={settings.defaultLocation}
@@ -36,8 +36,8 @@ export default function SettingsPanel({ settings, onChange }) {
       </SettingRow>
 
       <SettingRow
-        label="Standortfreigabe"
-        description="Aktuellen Standort für Suche verwenden"
+        label="Location Sharing"
+        description="Use current location for searches"
       >
         <Switch
           value={settings.locationEnabled}
@@ -48,8 +48,8 @@ export default function SettingsPanel({ settings, onChange }) {
       </SettingRow>
 
       <SettingRow
-        label="Push-Nachrichten"
-        description="Benachrichtigungen für Preisänderungen"
+        label="Push Notifications"
+        description="Notifications for price changes"
       >
         <Switch
           value={settings.pushEnabled}
@@ -59,7 +59,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
-      <SettingRow label="Standardbudget" description="Maximales Budget in Euro">
+      <SettingRow label="Standard Budget" description="Maximum budget in EUR">
         <TextInput
           value={String(settings.standardBudget)}
           onChangeText={(value) =>
@@ -70,7 +70,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
-      <SettingRow label="Währung">
+      <SettingRow label="Currency" description="Selected currency for display">
         <TextInput
           value={settings.currency}
           onChangeText={(value) => updateField("currency", value)}
@@ -79,7 +79,7 @@ export default function SettingsPanel({ settings, onChange }) {
       </SettingRow>
 
       <View style={styles.transportBlock}>
-        <Text style={styles.transportTitle}>Bevorzugte Verkehrsmittel</Text>
+        <Text style={styles.transportTitle}>Preferred Transport Modes</Text>
 
         <View style={styles.transportSelector}>
           <PreferredTransportSelector
