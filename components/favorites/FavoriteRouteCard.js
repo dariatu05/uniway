@@ -1,11 +1,20 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { isRouteExpired } from "../../data/expiredRoutes";
 import { COLORS } from "../../styles/colors";
+
 const transportLabels = {
-  car: "Auto",
-  train: "Zug",
+  car: "Car",
+  train: "Train",
   bus: "Bus",
-  plane: "Flugzeug",
+  plane: "Plane",
+};
+
+const TRANSPORT_ICONS = {
+  bus: 'bus',
+  train: 'train',
+  plane: 'airplane',
+  car: 'car',
 };
 
 function formatDuration(minutes) {
@@ -20,8 +29,13 @@ function formatDuration(minutes) {
   return `${hours} h ${mins} min`;
 }
 
+
+
 export default function FavoriteRouteCard({ route, onDelete }) {
   const expired = isRouteExpired(route);
+
+  const transportType = route.mainTransport?.toLowerCase();
+  const iconName = TRANSPORT_ICONS[transportType] || "map-marker";
 
   return (
     <View style={[styles.card, expired && styles.expiredCard]}>
@@ -29,39 +43,109 @@ export default function FavoriteRouteCard({ route, onDelete }) {
         <Text style={styles.expiredText}>This route has expired.</Text>
       ) : null}
 
+      <View style={styles.topRow}>
+        <View style={styles.transportWrap}>
+          <MaterialCommunityIcons name={iconName} size={24} color={expired ? "#7f1d1d" : COLORS.primary} />
+          <Text style={[styles.transportText, expired && styles.textMuted]}>
+            {transportLabels[route.mainTransport] || route.mainTransport}
+          </Text>
+        </View>
+
+        <TouchableOpacity onPress={() => onDelete(route.id)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <MaterialCommunityIcons name="trash-can-outline" size={24} color={expired ? "#ef4444" : "#64748b"} />
+        </TouchableOpacity>
+      </View>
+
+
       <Text style={styles.title}>
         {route.from} → {route.to}
       </Text>
 
-      <Text style={styles.info}>
-        Datum: <Text style={styles.bold}>{route.date}</Text>
-      </Text>
-
-      <Text style={styles.info}>
-        Verkehrsmittel:{" "}
-        <Text style={styles.bold}>
-          {transportLabels[route.mainTransport] || route.mainTransport}
+      <View style={styles.dateRow}>
+        <MaterialCommunityIcons 
+          name="calendar-month" 
+          size={20} 
+          color={expired ? "#7f1d1d" : COLORS.secondary} 
+          style={styles.calendarIcon} 
+        />
+        <Text style={[styles.info, styles.bold, expired ? styles.textMuted : { color: COLORS.secondary }, { marginBottom: 0 }]}>
+          {route.date}
         </Text>
-      </Text>
+      </View>
 
-      <Text style={styles.info}>
-        Dauer:{" "}
-        <Text style={styles.bold}>{formatDuration(route.durationMinutes)}</Text>
-      </Text>
+      <View style={[styles.statsRow, expired && styles.statsRowExpired]}>
+        <View style={styles.statItem}>
+          <Text style={[styles.statValue, expired && styles.textMuted]}>
+            {route.price} €
+          </Text>
+          <Text style={[styles.statLabel, expired && styles.textMuted]}>Price</Text>
+        </View>
+        
+        <View style={[styles.divider, expired && styles.dividerExpired]} />
+        
+        <View style={styles.statItem}>
+          <Text style={[styles.statValue, expired && styles.textMuted]}>
+            {formatDuration(route.durationMinutes)}
+          </Text>
+          <Text style={[styles.statLabel, expired && styles.textMuted]}>Duration</Text>
+        </View>
+      </View>
 
-      <Text style={styles.price}>{route.price} €</Text>
-
-      <TouchableOpacity
-        style={[styles.button, expired && styles.deleteButton]}
-        onPress={() => onDelete(route.id)}
-      >
-        <Text style={styles.buttonText}>Delete</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+   dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  calendarIcon: {
+    marginRight: 6,
+    opacity: 0.7,
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+   statItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: COLORS.text,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: COLORS.text,
+    opacity: 0.5,
+    marginTop: 4,
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  transportText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+  transportWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 12,
+  },
   card: {
     backgroundColor: COLORS.surface,
     borderRadius: 20,
@@ -96,25 +180,18 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: "800",
   },
-  price: {
-    color: COLORS.secondary,
-    fontSize: 26,
-    fontWeight: "900",
-    marginTop: 8,
-    marginBottom: 14,
+  statsRowExpired: {
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
-  button: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    alignSelf: "flex-start",
+  divider: {
+    width: 1,
+    height: "100%",
+    backgroundColor: "#e2e8f0",
   },
-  deleteButton: {
-    backgroundColor: "#b91c1c",
+  dividerExpired: {
+    backgroundColor: "#eeb4b4", 
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
+  textMuted: {
+    color: "#7f1d1d",
   },
 });

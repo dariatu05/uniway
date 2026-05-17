@@ -21,11 +21,6 @@ import { rankRoutes } from '../utils/routeRanking';
 import { RouteDetailsPage } from './RouteDetailsPage';
 
 
-// const SORT_OPTIONS = [
-//     { key: 'cheapest', label: '🏷️ Price' },
-//     { key: 'fastest', label: '⚡ Speed' },
-//     { key: 'best', label: '⭐ Best' },
-// ];
 
 const SORT_OPTIONS = [
     { key: 'cheapest', label: ' Price', icon: 'tag' },
