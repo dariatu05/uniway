@@ -56,6 +56,11 @@ export default function SearchScreen() {
     const [stops, setStops] = useState([]);
     const [useDefaultBudget, setUseDefaultBudget] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
+    const [fuelDistance, setFuelDistance] = useState('');
+    const [fuelConsumption, setFuelConsumption] = useState('');
+    const [fuelPrice, setFuelPrice] = useState('');
+    const [useDefaultFuelPrice, setUseDefaultFuelPrice] = useState(false);
+    const [fuelCost, setFuelCost] = useState(null);
 
     const addStop = () => setStops(prev => [...prev, '']);
     const updateStop = (index, value) => setStops(prev => prev.map((item, idx) => idx === index ? value : item));
@@ -105,6 +110,32 @@ export default function SearchScreen() {
         );
     };
 
+    // Automatische Spritkosten-Berechnung
+    const calculateFuelCost = (distance, consumption, price) => {
+        if (distance && consumption && price) {
+            const cost = (parseFloat(distance) / 100) * parseFloat(consumption) * parseFloat(price);
+            setFuelCost(cost.toFixed(2));
+        } else {
+            setFuelCost(null);
+        }
+    };
+
+    // Berechnung bei Änderung der Eingabefelder
+    const handleDistanceChange = (value) => {
+        setFuelDistance(value);
+        calculateFuelCost(value, fuelConsumption, fuelPrice);
+    };
+
+    const handleConsumptionChange = (value) => {
+        setFuelConsumption(value);
+        calculateFuelCost(fuelDistance, value, fuelPrice);
+    };
+
+    const handleFuelPriceChange = (value) => {
+        setFuelPrice(value);
+        calculateFuelCost(fuelDistance, fuelConsumption, value);
+    };
+
     const resetSearchInputs = () => {
         setStartLocation('');
         setDestination('');
@@ -116,6 +147,11 @@ export default function SearchScreen() {
         setStops([]);
         setUseDefaultBudget(false);
         setSelectedDate('');
+        setFuelDistance('');
+        setFuelConsumption('');
+        setFuelPrice('');
+        setUseDefaultFuelPrice(false);
+        setFuelCost(null);
     };
 
     // Hilfsfunktion für Preisfarben im Kalender
@@ -228,6 +264,50 @@ export default function SearchScreen() {
                             </View>
                         </View>
 
+                        {/* Fuel Cost Calculator - nur wenn Car ausgewählt ist */}
+                        {selectedTransports.includes('Car') && (
+                            <View style={styles.fieldGroup}>
+                                <Text style={styles.customLabel}>Fuel Cost Calculator</Text>
+                                <Input
+                                    label="Distance"
+                                    placeholder="Enter kilometers to be driven"
+                                    value={fuelDistance}
+                                    onChangeText={handleDistanceChange}
+                                    keyboardType="decimal-pad"
+                                />
+                                <Input
+                                    label="Fuel Consumption"
+                                    placeholder="Enter liters per 100 km"
+                                    value={fuelConsumption}
+                                    onChangeText={handleConsumptionChange}
+                                    keyboardType="decimal-pad"
+                                />
+                                <Input
+                                    label="Fuel Price"
+                                    placeholder="Enter price per liter (€)"
+                                    value={fuelPrice}
+                                    onChangeText={handleFuelPriceChange}
+                                    keyboardType="decimal-pad"
+                                    editable={!useDefaultFuelPrice}
+                                />
+                                <TouchableOpacity onPress={() => {}} style={styles.profileLocationLink}>
+                                    <Text style={styles.profileLocationText}>
+                                        <MaterialCommunityIcons name="fuel" size={12} /> Use default fuel price
+                                    </Text>
+                                </TouchableOpacity>
+                                <View style={styles.fuelCostResult}>
+                                    {fuelCost ? (
+                                        <>
+                                            <Text style={styles.fuelCostLabel}>Estimated Fuel Cost</Text>
+                                            <Text style={styles.fuelCostValue}>€{fuelCost}</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.fuelCostPlaceholder}>Please fill in all fields to calculate costs</Text>
+                                    )}
+                                </View>
+                            </View>
+                        )}
+
                         <View style={styles.mainActions}>
                             <Button title="Reset" onPress={resetSearchInputs} variant="secondary" />
                             <Button title="Show prices in calendar" onPress={() => setShowCalendar(true)} variant="primary" />
@@ -322,5 +402,10 @@ const styles = StyleSheet.create({
     legendContainer: { flexDirection: 'row', justifyContent: 'flex-start', paddingVertical: 15, gap: 15 },
     legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     dot: { width: 12, height: 12, borderRadius: 6 },
-    legendText: { fontSize: 13, color: '#4b5563', fontWeight: '500' }
+    legendText: { fontSize: 13, color: '#4b5563', fontWeight: '500' },
+    calculateButton: { marginTop: 10 },
+    fuelCostResult: { marginTop: 15, padding: 12, backgroundColor: '#F0F9FF', borderRadius: 10, borderLeftWidth: 4, borderLeftColor: COLORS.primary },
+    fuelCostLabel: { fontSize: 12, color: '#0369A1', fontWeight: '500', marginBottom: 4 },
+    fuelCostValue: { fontSize: 24, fontWeight: '700', color: COLORS.primary },
+    fuelCostPlaceholder: { fontSize: 13, color: '#6b7280', fontStyle: 'italic', textAlign: 'center' }
 });
