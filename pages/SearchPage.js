@@ -110,6 +110,14 @@ export default function SearchScreen() {
         );
     };
 
+    const handleUseDefaultFuelPrice = () => {
+        const currentSettings = getProfileSettings();
+        const defaultPrice = currentSettings.defaultFuelPrice ?? '';
+        setUseDefaultFuelPrice(true);
+        setFuelPrice(defaultPrice.toString());
+        calculateFuelCost(fuelDistance, fuelConsumption, defaultPrice.toString());
+    };
+
     // Automatische Spritkosten-Berechnung
     const calculateFuelCost = (distance, consumption, price) => {
         if (distance && consumption && price) {
@@ -290,7 +298,7 @@ export default function SearchScreen() {
                                     keyboardType="decimal-pad"
                                     editable={!useDefaultFuelPrice}
                                 />
-                                <TouchableOpacity onPress={() => {}} style={styles.profileLocationLink}>
+                                <TouchableOpacity onPress={handleUseDefaultFuelPrice} style={styles.profileLocationLink}>
                                     <Text style={styles.profileLocationText}>
                                         <MaterialCommunityIcons name="fuel" size={12} /> Use default fuel price
                                     </Text>
