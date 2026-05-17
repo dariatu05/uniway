@@ -7,24 +7,19 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { LikeRouteButton } from './LikeRouteButton';
 import { COLORS } from '../styles/colors';
 import { getLabelColor, getLabelText } from '../utils/routeRanking';
+import { LikeRouteButton } from './LikeRouteButton';
 
 const TRANSPORT_ICONS = {
-    bus:   'bus',
+    bus: 'bus',
     train: 'train',
     plane: 'airplane',
-    car:   'car',
+    car: 'car',
 };
 
-/**
- * @param {Object} props
- * @param {Object}   props.route    - route object (from rankRoutes — has .label)
- * @param {Function} props.onPress  - called when card is tapped
- */
 export function RouteCard({ route, onPress }) {
-    const icon      = TRANSPORT_ICONS[route.type] || 'bus';
+    const icon = TRANSPORT_ICONS[route.type] || 'bus';
     const labelText = getLabelText(route.label);
     const labelColor = getLabelColor(route.label);
 
@@ -47,7 +42,20 @@ export function RouteCard({ route, onPress }) {
 
                 <View style={styles.topRight}>
                     {labelText && (
-                        <View style={[styles.badge, { backgroundColor: labelColor }]}>
+                        <View style={[
+                            styles.badge,
+                            {
+                                backgroundColor: labelColor?.backgroundColor,
+                                borderColor: labelColor?.borderColor,
+                                borderWidth: labelColor?.borderWidth ?? 0
+                            }
+                        ]}>
+                            <MaterialCommunityIcons
+                                name={labelColor?.iconName}
+                                size={13}
+                                color={labelColor?.iconColor}
+                                style={styles.badgeIcon}
+                            />
                             <Text style={styles.badgeText}>{labelText}</Text>
                         </View>
                     )}
@@ -133,6 +141,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     badgeText: {
         color: '#fff',

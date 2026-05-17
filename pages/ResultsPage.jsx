@@ -1,26 +1,24 @@
 // ResultsPage.jsx
 // Location: src/pages/ResultsPage.jsx
 //
-// Rendered by SearchPage in State 4 (showRouteResults === true).
-// Receives search params as props — no React Navigation needed here.
-// If your team later adds a separate /results route, it also works via navigation params.
+// Showes list of routes matching search criteria, with sorting options and detail view.
+// Uses mock data from src/data/mockRoutes.js and ranking logic from src/utils/routeRanking.js.
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
 
+import { BackButton, ScreenLayout } from '../components/CommonLayout';
 import { RouteCard } from '../components/RouteCard';
 import { MOCK_ROUTES } from '../data/mockRoutes';
 import { COLORS } from '../styles/colors';
 import { rankRoutes } from '../utils/routeRanking';
 import { RouteDetailsPage } from './RouteDetailsPage';
-import { ScreenLayout, BackButton } from '../components/CommonLayout';
 
 
 // const SORT_OPTIONS = [
@@ -42,16 +40,6 @@ const TRANSPORT_MAP = {
     'Flugzeug': 'plane',
 };
 
-/**
- * @param {Object}   props
- * @param {string}   props.from                - departure city from SearchPage
- * @param {string}   props.to                  - destination city from SearchPage
- * @param {string}   props.selectedDate        - ISO date chosen in calendar (e.g. '2026-06-15')
- * @param {string}   props.maxBudget           - max budget string ('' = no limit)
- * @param {string[]} props.selectedTransports  - e.g. ['Bus', 'Zug'] or [] for all
- * @param {boolean}  props.directOnly          - show only routes with 0 transfers
- * @param {Function} props.onBack              - called when user presses back
- */
 export default function ResultsPage({
     from = '',
     to = '',
@@ -116,7 +104,14 @@ export default function ResultsPage({
                 <Text style={styles.title}>Results</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
                 {selectedDate !== '' && (
-                    <Text style={styles.dateLabel}>📅 {selectedDate}</Text>
+                    <View style={styles.dateRow}>
+                        <MaterialCommunityIcons
+                            name="calendar-month"
+                            size={14}
+                            color={COLORS.secondary}
+                        />
+                        <Text style={styles.dateLabel}>{selectedDate}</Text>
+                    </View>
                 )}
             </View>
 
@@ -200,6 +195,12 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: COLORS.secondary,
         fontWeight: '600',
+        marginTop: 4,
+    },
+    dateRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
         marginTop: 4,
     },
     sortRow: {

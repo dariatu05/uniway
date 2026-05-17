@@ -1,9 +1,9 @@
 // favoritesStore.js
 // Location: src/utils/favoritesStore.js
-// Simple in-memory favorites store for UniWay.
+// Simple in-memory favorites store 
 
-let savedRoutes = []; // in-memory list of liked routes
-const listeners = new Set(); // subscribers for reactive updates
+let savedRoutes = [];
+const listeners = new Set(); 
 
 /**
  * Returns a copy of the current favorites list.
@@ -51,11 +51,7 @@ export function toggleFavorite(route) {
     }
 }
 
-/**
- * Subscribe to favorites changes.
- * @param {Function} listener - called whenever favorites change
- * @returns {Function} unsubscribe function
- */
+
 export function subscribeFavorites(listener) {
     listeners.add(listener);
     return () => listeners.delete(listener);

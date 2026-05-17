@@ -2,8 +2,6 @@
 // Location: src/pages/RouteDetailsPage.jsx
 //
 // Full detail view for one selected route.
-// Used inline inside ResultsPage (no React Navigation needed).
-// Props: route (object), onBack (function)
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -30,11 +28,6 @@ const TRANSPORT_ICONS = {
   car: "car",
 };
 
-/**
- * @param {Object}   props
- * @param {Object}   props.route   - the selected route object
- * @param {Function} props.onBack  - go back to results list
- */
 export function RouteDetailsPage({ route, onBack }) {
   if (!route) {
     return (

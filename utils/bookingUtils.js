@@ -2,7 +2,7 @@
 // Location: src/utils/bookingUtils.js
 //
 // Opens external booking websites for routes and segments.
-// Uses React Native's Linking API (no external packages needed).
+// Uses API from React Native's Linking module. Provides fallback URLs for each transport type.
 
 import { Linking } from 'react-native';
 
@@ -14,11 +14,7 @@ const DEFAULT_URLS = {
     car:   'https://www.blablacar.com',
 };
 
-/**
- * Opens the booking page for a full route.
- * Prefers route.bookingUrl, falls back to transport type default.
- * @param {Object} route
- */
+
 export async function openBookingForRoute(route) {
     const url = route.bookingUrl || DEFAULT_URLS[route.type] || DEFAULT_URLS[route.mainTransport] || 'https://www.google.com';
     await _open(url);
