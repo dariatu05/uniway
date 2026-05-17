@@ -1,16 +1,21 @@
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../../styles/colors";
+
+// Component for showing basic user profile information
 export default function ProfileHeader({ name, defaultLocation }) {
   return (
     <View style={styles.card}>
+      {/* Avatar circle with the first letter of the name */}
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>
           {name?.charAt(0)?.toUpperCase() || "U"}
         </Text>
       </View>
 
+      {/* User name */}
       <Text style={styles.name}>{name}</Text>
 
+      {/* User's def location */}
       <Text style={styles.location}>
         Default Location: {defaultLocation || "Not set"}
       </Text>
@@ -18,7 +23,9 @@ export default function ProfileHeader({ name, defaultLocation }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
+  // Main profile card
   card: {
     backgroundColor: COLORS.surface,
     padding: 22,
@@ -29,6 +36,8 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 4,
   },
+
+  // Avatar circle
   avatar: {
     width: 64,
     height: 64,
@@ -38,17 +47,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 14,
   },
+
+  // Letter inside the avatar
   avatarText: {
     color: COLORS.primary,
     fontSize: 26,
     fontWeight: "900",
   },
+
+  // User name
   name: {
     color: COLORS.text,
     fontSize: 22,
     fontWeight: "900",
     marginBottom: 6,
   },
+
+  // Def location text
   location: {
     color: "#64748b",
     fontSize: 15,

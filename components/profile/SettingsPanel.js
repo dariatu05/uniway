@@ -4,7 +4,9 @@ import { COLORS } from "../../styles/colors";
 import PreferredTransportSelector from "./PreferredTransportSelector";
 import SettingRow from "./SettingRow";
 
+// Panel component for editing user profile settings
 export default function SettingsPanel({ settings, onChange }) {
+  // Updates one field inside the settings object
   function updateField(field, value) {
     onChange({
       ...settings,
@@ -14,8 +16,10 @@ export default function SettingsPanel({ settings, onChange }) {
 
   return (
     <View style={styles.panel}>
+      {/* Title */}
       <Text style={styles.title}>Settings</Text>
 
+      {/* User display name */}
       <SettingRow label="Name" description="Display name in profile">
         <TextInput
           value={settings.name}
@@ -24,6 +28,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Def location */}
       <SettingRow
         label="Default Location"
         description="Used when no location is shared"
@@ -35,6 +40,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Click for using current location */}
       <SettingRow
         label="Location Sharing"
         description="Use current location for searches"
@@ -47,6 +53,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Click for notification alerts */}
       <SettingRow
         label="Push Notifications"
         description="Notifications for price changes"
@@ -59,6 +66,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Standard travel budget */}
       <SettingRow label="Standard Budget" description="Maximum budget in EUR">
         <TextInput
           value={String(settings.standardBudget)}
@@ -70,6 +78,7 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Currency for displaying prices */}
       <SettingRow label="Currency" description="Selected currency for display">
         <TextInput
           value={settings.currency}
@@ -78,6 +87,22 @@ export default function SettingsPanel({ settings, onChange }) {
         />
       </SettingRow>
 
+      {/* Default fuel price */}
+      <SettingRow
+        label="Default Fuel Price"
+        description="Fuel price per liter in EUR"
+      >
+        <TextInput
+          value={String(settings.defaultFuelPrice)}
+          onChangeText={(value) =>
+            updateField("defaultFuelPrice", Number(value) || 0)
+          }
+          keyboardType="decimal-pad"
+          style={styles.input}
+        />
+      </SettingRow>
+
+      {/* Preferred transport selection */}
       <View style={styles.transportBlock}>
         <Text style={styles.transportTitle}>Preferred Transport Modes</Text>
 
@@ -92,7 +117,9 @@ export default function SettingsPanel({ settings, onChange }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
+  // Main settings card
   panel: {
     backgroundColor: COLORS.surface,
     padding: 20,
@@ -102,12 +129,16 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 4,
   },
+
+  // Settings title
   title: {
     color: COLORS.text,
     fontSize: 22,
     fontWeight: "900",
     marginBottom: 6,
   },
+
+  // Input fields for text and numbers
   input: {
     borderWidth: 1,
     borderColor: "#dbe2ef",
@@ -118,14 +149,20 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     backgroundColor: "#FFFFFF",
   },
+
+  // Container for transport preferences
   transportBlock: {
     marginTop: 18,
   },
+
+  // Title for transport selector
   transportTitle: {
     color: COLORS.text,
     fontSize: 15,
     fontWeight: "800",
   },
+
+  // Space above transport buttons
   transportSelector: {
     marginTop: 12,
   },

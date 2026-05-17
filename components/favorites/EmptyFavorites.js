@@ -5,9 +5,10 @@ export default function EmptyFavorites() {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>♡</Text>
-      <Text style={styles.title}>Keine Favoriten</Text>
+      <Text style={styles.title}>No Favorites Yet</Text>
       <Text style={styles.text}>
-        Gespeicherte Routen werden später hier angezeigt.
+        Save your favorite routes to easily find them later. Just tap the heart
+        icon on any route to add it to your favorites!
       </Text>
     </View>
   );

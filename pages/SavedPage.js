@@ -16,14 +16,20 @@ import {
 } from "../api/storageApi";
 
 import { COLORS } from "../styles/colors";
+
 export default function SavedPage() {
+  // Stores all saved favorite routes
   const [favorites, setFavorites] = useState([]);
+
+  // Stores only routes that are already expired
   const [expiredRoutes, setExpiredRoutes] = useState([]);
 
+  // Runs once when the page is opened
   useEffect(() => {
     loadFavorites();
   }, []);
 
+  // Loads saved routes and expired routes from storage
   function loadFavorites() {
     const savedRoutes = getFavoriteRoutes();
     const expired = getExpiredRoutes();
@@ -32,28 +38,42 @@ export default function SavedPage() {
     setExpiredRoutes(expired);
   }
 
+  // Deletes one selected route from favorites
   function handleDelete(routeId) {
     const updatedFavorites = deleteFavoriteRoute(routeId);
+
     setFavorites(updatedFavorites);
+
+    // Refresh expired routes after deleting
     setExpiredRoutes(getExpiredRoutes());
   }
 
+  // Deletes all routes that are already expired
   function handleDeleteAllExpired() {
     const updatedFavorites = clearExpiredRoutes();
+
     setFavorites(updatedFavorites);
+
+    // After deleting them, expired list is empty
     setExpiredRoutes([]);
   }
 
+  // Checks if the route date is before today
   function isExpired(route) {
     const today = new Date();
+
+    // Removes current time, so only the date is compared
     today.setHours(0, 0, 0, 0);
 
     const routeDate = new Date(route.date);
+
+    // Also remove time from the route date
     routeDate.setHours(0, 0, 0, 0);
 
     return routeDate < today;
   }
 
+  // Opens the booking link in the browser
   function openBookingUrl(url) {
     if (url) {
       Linking.openURL(url);
@@ -62,36 +82,39 @@ export default function SavedPage() {
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Gespeicherte Routen</Text>
+      {/* Page title */}
+      <Text style={styles.title}>Saved Routes</Text>
 
+      {/* Shows warning if expired routes exist */}
       {expiredRoutes.length > 0 ? (
         <View style={styles.expiredBanner}>
           <Text style={styles.expiredTitle}>
-            {expiredRoutes.length} Route(n) sind abgelaufen.
+            {expiredRoutes.length} route(s) have expired.
           </Text>
 
-          <Text style={styles.expiredText}>
-            Diese Routen liegen in der Vergangenheit.
-          </Text>
+          <Text style={styles.expiredText}>These routes are in the past.</Text>
 
+          {/* Button for deleting all expired routes */}
           <TouchableOpacity
             style={styles.dangerButton}
             onPress={handleDeleteAllExpired}
           >
-            <Text style={styles.buttonText}>Alle abgelaufenen löschen</Text>
+            <Text style={styles.buttonText}>Delete all expired </Text>
           </TouchableOpacity>
         </View>
       ) : null}
 
+      {/* Shows empty message if no saved routes exist */}
       {favorites.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>Keine gespeicherten Routen</Text>
+          <Text style={styles.emptyTitle}>No saved routes</Text>
+
           <Text style={styles.emptyText}>
-            Gespeicherte Reisen werden hier angezeigt, sobald du eine Route
-            speicherst.
+            Saved trips will be displayed here once you save a route.
           </Text>
         </View>
       ) : (
+        // Shows all saved routes
         favorites.map((route) => {
           const expired = isExpired(route);
 
@@ -100,27 +123,33 @@ export default function SavedPage() {
               key={route.id}
               style={[styles.card, expired && styles.expiredCard]}
             >
+              {/* Route information and price */}
               <View style={styles.cardHeader}>
                 <View style={styles.routeInfo}>
+                  {/* Start and destination */}
                   <Text
                     style={[styles.routeTitle, expired && styles.whiteText]}
                   >
                     {route.from} → {route.to}
                   </Text>
 
+                  {/* Travel date */}
                   <Text style={[styles.infoText, expired && styles.whiteText]}>
                     Datum: {formatDate(route.date)}
                   </Text>
 
+                  {/* Main transport type */}
                   <Text style={[styles.infoText, expired && styles.whiteText]}>
                     Verkehrsmittel: {route.mainTransport}
                   </Text>
 
+                  {/* Travel duration */}
                   <Text style={[styles.infoText, expired && styles.whiteText]}>
                     Dauer: {route.durationMinutes} Minuten
                   </Text>
                 </View>
 
+                {/* Route price */}
                 <View style={styles.priceBox}>
                   <Text style={[styles.price, expired && styles.whiteText]}>
                     {route.price} €
@@ -128,13 +157,16 @@ export default function SavedPage() {
                 </View>
               </View>
 
+              {/* Extra text for expired route */}
               {expired ? (
                 <Text style={styles.expiredRouteText}>
                   Diese Route ist abgelaufen.
                 </Text>
               ) : null}
 
+              {/* Action buttons */}
               <View style={styles.buttonRow}>
+                {/* Opens provider website if booking link exists */}
                 {route.bookingUrl ? (
                   <TouchableOpacity
                     style={styles.primaryButton}
@@ -144,6 +176,7 @@ export default function SavedPage() {
                   </TouchableOpacity>
                 ) : null}
 
+                {/* Deletes this route */}
                 <TouchableOpacity
                   style={styles.dangerButton}
                   onPress={() => handleDelete(route.id)}
@@ -159,6 +192,7 @@ export default function SavedPage() {
   );
 }
 
+// Formats date for Austrian display
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("de-AT", {
     day: "2-digit",

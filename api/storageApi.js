@@ -1,14 +1,17 @@
 import { mockFavorites } from "../data/mockFavorites";
 
+// Keys for saving data
 const FAVORITES_KEY = "uniway_favorite_routes";
 const PROFILE_KEY = "uniway_profile_settings";
 
+// Backup storage if localStorage is not available
 const memoryStorage = {};
 
 function hasLocalStorage() {
   return typeof localStorage !== "undefined";
 }
 
+// Reads value from localStorage or memory backup
 function getItem(key) {
   if (hasLocalStorage()) {
     return localStorage.getItem(key);
@@ -17,6 +20,7 @@ function getItem(key) {
   return memoryStorage[key] || null;
 }
 
+// Saves value to localStorage or memory backup
 function setItem(key, value) {
   if (hasLocalStorage()) {
     localStorage.setItem(key, value);
@@ -26,6 +30,7 @@ function setItem(key, value) {
   memoryStorage[key] = value;
 }
 
+// Default profile settings
 const defaultSettings = {
   name: "UniWay User",
   defaultLocation: "Wien",
@@ -33,9 +38,11 @@ const defaultSettings = {
   pushEnabled: false,
   currency: "EUR",
   standardBudget: 100,
+  defaultFuelPrice: 1.9,
   preferredTransports: ["bus", "train"],
 };
 
+// Gets saved favorite routes
 export function getFavoriteRoutes() {
   const storedFavorites = getItem(FAVORITES_KEY);
 
@@ -50,10 +57,12 @@ export function getFavoriteRoutes() {
   }
 }
 
+// Saves all favorite routes
 export function saveFavoriteRoutes(routes) {
   setItem(FAVORITES_KEY, JSON.stringify(routes));
 }
 
+// Adds one route to favorites
 export function saveFavoriteRoute(route) {
   const favorites = getFavoriteRoutes();
   const alreadyExists = favorites.some((item) => item.id === route.id);
@@ -68,6 +77,7 @@ export function saveFavoriteRoute(route) {
   return updatedFavorites;
 }
 
+// Deletes one favorite route
 export function deleteFavoriteRoute(routeId) {
   const favorites = getFavoriteRoutes();
 
@@ -78,6 +88,7 @@ export function deleteFavoriteRoute(routeId) {
   return updatedFavorites;
 }
 
+// Deletes all expired favorite routes
 export function deleteExpiredFavoriteRoutes(isExpiredFn) {
   const favorites = getFavoriteRoutes();
 
@@ -88,6 +99,7 @@ export function deleteExpiredFavoriteRoutes(isExpiredFn) {
   return updatedFavorites;
 }
 
+// Gets saved profile settings
 export function getProfileSettings() {
   const storedSettings = getItem(PROFILE_KEY);
 
@@ -105,6 +117,7 @@ export function getProfileSettings() {
   }
 }
 
+// Saves profile settings
 export function saveProfileSettings(settings) {
   setItem(PROFILE_KEY, JSON.stringify(settings));
 }
