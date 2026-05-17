@@ -1,3 +1,6 @@
+// Darstellung einer einzelnen Route in der Favoritenliste, mit Informationen und Löschoption
+// FavoriteRouteCard.js
+// Location: src/components/favorites/FavoriteRouteCard.js
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { isRouteExpired } from "../../data/expiredRoutes";
@@ -42,7 +45,7 @@ export default function FavoriteRouteCard({ route, onDelete }) {
       {expired ? (
         <Text style={styles.expiredText}>This route has expired.</Text>
       ) : null}
-
+      {/* Oben: Transportart mit Icon, rechts davon ein Löschbutton, der rot ist wenn die Route abgelaufen ist, ansonsten grau */}
       <View style={styles.topRow}>
         <View style={styles.transportWrap}>
           <MaterialCommunityIcons name={iconName} size={24} color={expired ? "#7f1d1d" : COLORS.primary} />
@@ -50,29 +53,29 @@ export default function FavoriteRouteCard({ route, onDelete }) {
             {transportLabels[route.mainTransport] || route.mainTransport}
           </Text>
         </View>
-
+        {/* Löschbutton mit rotem Icon, wenn die Route abgelaufen ist, ansonsten grau */}
         <TouchableOpacity onPress={() => onDelete(route.id)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <MaterialCommunityIcons name="trash-can-outline" size={24} color={expired ? "#ef4444" : "#64748b"} />
         </TouchableOpacity>
       </View>
 
-
+      {/* Routenname */}
       <Text style={styles.title}>
         {route.from} → {route.to}
       </Text>
-
+      {/* Datum mit Kalender-Icon, rot wenn abgelaufen, ansonsten sekundärfarbe */}
       <View style={styles.dateRow}>
-        <MaterialCommunityIcons 
-          name="calendar-month" 
-          size={20} 
-          color={expired ? "#7f1d1d" : COLORS.secondary} 
-          style={styles.calendarIcon} 
+        <MaterialCommunityIcons
+          name="calendar-month"
+          size={20}
+          color={expired ? "#7f1d1d" : COLORS.secondary}
+          style={styles.calendarIcon}
         />
         <Text style={[styles.info, styles.bold, expired ? styles.textMuted : { color: COLORS.secondary }, { marginBottom: 0 }]}>
           {route.date}
         </Text>
       </View>
-
+      {/* Preis und Dauer in einer Zeile, mit Trennstrich, grau wenn abgelaufen */}
       <View style={[styles.statsRow, expired && styles.statsRowExpired]}>
         <View style={styles.statItem}>
           <Text style={[styles.statValue, expired && styles.textMuted]}>
@@ -80,9 +83,9 @@ export default function FavoriteRouteCard({ route, onDelete }) {
           </Text>
           <Text style={[styles.statLabel, expired && styles.textMuted]}>Price</Text>
         </View>
-        
+
         <View style={[styles.divider, expired && styles.dividerExpired]} />
-        
+
         <View style={styles.statItem}>
           <Text style={[styles.statValue, expired && styles.textMuted]}>
             {formatDuration(route.durationMinutes)}
@@ -96,7 +99,7 @@ export default function FavoriteRouteCard({ route, onDelete }) {
 }
 
 const styles = StyleSheet.create({
-   dateRow: {
+  dateRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 16,
   },
-   statItem: {
+  statItem: {
     flex: 1,
     alignItems: "center",
   },
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#e2e8f0",
   },
   dividerExpired: {
-    backgroundColor: "#eeb4b4", 
+    backgroundColor: "#eeb4b4",
   },
   textMuted: {
     color: "#7f1d1d",
