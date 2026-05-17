@@ -17,10 +17,10 @@ export default function FavoritesPage() {
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Favoriten</Text>
+      <Text style={styles.title}>Favorites</Text>
 
       <Text style={styles.subtitle}>
-        Hier findest du deine gespeicherten Routen.
+        Here you can find your saved routes.
       </Text>
 
       {favorites.length === 0 ? (

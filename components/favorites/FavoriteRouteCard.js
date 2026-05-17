@@ -9,7 +9,7 @@ const transportLabels = {
 };
 
 function formatDuration(minutes) {
-  if (!minutes) return "Keine Angabe";
+  if (!minutes) return "No data";
 
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
@@ -26,7 +26,7 @@ export default function FavoriteRouteCard({ route, onDelete }) {
   return (
     <View style={[styles.card, expired && styles.expiredCard]}>
       {expired ? (
-        <Text style={styles.expiredText}>Diese Route ist abgelaufen.</Text>
+        <Text style={styles.expiredText}>This route has expired.</Text>
       ) : null}
 
       <Text style={styles.title}>
@@ -55,7 +55,7 @@ export default function FavoriteRouteCard({ route, onDelete }) {
         style={[styles.button, expired && styles.deleteButton]}
         onPress={() => onDelete(route.id)}
       >
-        <Text style={styles.buttonText}>Löschen</Text>
+        <Text style={styles.buttonText}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
