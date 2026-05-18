@@ -1,3 +1,6 @@
+// API for managing local storage of favorites and profile settings
+// storageApi.js
+// Location: src/api/storageApi.js
 import { mockFavorites } from "../data/mockFavorites";
 
 // Keys for saving data
