@@ -35,11 +35,19 @@ Weitere Anmerkungen:
 - KI-Transparenz: Zur Erstellung dieses Prototyps wurden KI-Assistenzsysteme für Code-Vorschläge, Mock-Daten-Generierung und Fehlerbehebung genutzt. Detaillierte Informationen zur KI-Nutzung werden in der beiliegenden PDF dokumentiert.
 - Projektstruktur:
 UNIWAY/
+
 ├── api/           # Schnittstellenlogik (z. B. storageApi für lokale Datenpersistenz)
+
 ├── assets/        # Statische Ressourcen (App-Icon, Button-Bilder)
+
 ├── components/    # Wiederverwendbare UI-Komponenten (z. B. RouteCard, Buttons)
+
 ├── data/          # Lokale Mock-Daten für den Prototypen
+
 ├── pages/         # App-Seiten
+
 ├── styles/        # Zentrale Design-Konfigurationen (Farbpalette)
+
 ├── utils/         # Hilfsfunktionen (z. B. routeRanking)
+
 └── App.js         # Haupteinstiegspunkt und zentrale Navigationskonfiguration
