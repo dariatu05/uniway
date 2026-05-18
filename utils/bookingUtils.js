@@ -20,10 +20,7 @@ export async function openBookingForRoute(route) {
     await _open(url);
 }
 
-/**
- * Opens the booking page for a single route segment.
- * @param {Object} segment
- */
+
 export async function openBookingForSegment(segment) {
     const url = segment.bookingUrl || DEFAULT_URLS[segment.type] || 'https://www.google.com';
     await _open(url);

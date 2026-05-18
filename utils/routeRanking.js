@@ -23,7 +23,7 @@ export function rankRoutes(routes) {
         if (r.durationMinutes < routes[fastestIdx].durationMinutes) fastestIdx = i;
     });
 
-    // --- Best: weighted score (price 50%, duration 35%, transfers 15%) ---
+    // --- Best: weighted score  ---
     const prices = routes.map(r => r.price);
     const durations = routes.map(r => r.durationMinutes);
     const transfers = routes.map(r => r.transfers ?? 0);

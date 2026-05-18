@@ -1,3 +1,6 @@
+// Component for displaying a badge indicating the type of transport (e.g., train, bus, car, plane)
+// TransportBadge.js
+// Location: src/components/TransportBadge.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../styles/colors';

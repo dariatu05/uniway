@@ -1,3 +1,6 @@
+// ProfilePage.js
+// Page for displaying and managing user profile settings
+// Location: src/pages/ProfilePage.js
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 

@@ -1,3 +1,6 @@
+// FavoritesPage.js
+// Page for displaying user's favorite routes
+// Location: src/pages/FavoritesPage.js
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 

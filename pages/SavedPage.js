@@ -1,3 +1,6 @@
+// Page for displaying and managing saved favorite routes
+// SavedPage.js
+// Location: src/pages/SavedPage.js
 import { useEffect, useState } from "react";
 import {
   Linking,

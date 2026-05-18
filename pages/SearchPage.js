@@ -1,3 +1,4 @@
+// SearchPage.js
 // Kurzbeschreibung: Dieser Suchscreeen hat 4 Zustände:
 // 1. Startbildschirm mit Suchleiste
 // 2. Detaillierte Suche mit erweiterten Optionen
