@@ -34,6 +34,7 @@ Dauer der Entwicklung:
 Weitere Anmerkungen:
 - KI-Transparenz: Zur Erstellung dieses Prototyps wurden KI-Assistenzsysteme für Code-Vorschläge, Mock-Daten-Generierung und Fehlerbehebung genutzt. Detaillierte Informationen zur KI-Nutzung werden in der beiliegenden PDF dokumentiert.
 - Projektstruktur:
+  
 UNIWAY/
 
 ├── api/           # Schnittstellenlogik (z. B. storageApi für lokale Datenpersistenz)
