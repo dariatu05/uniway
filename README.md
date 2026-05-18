@@ -32,3 +32,4 @@ Dauer der Entwicklung:
 74 Stunden (Daria: 18h, Rufina: 18.5h, Mariia: 20h, Mariana: 17.5h)
 
 Weitere Anmerkungen:
+- KI-Transparenz: Zur Erstellung dieses Prototyps wurden KI-Assisten für Code-Vorschläge, MockDaten-Generierung und Fehlerbehebung genutzt. Detaillierte Informationen zur KI-Nutzung wird in PDF Datei dokumentiert.

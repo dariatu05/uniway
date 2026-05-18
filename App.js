@@ -1,3 +1,6 @@
+// Hauptdatei, die die Navigation und die grundlegende Struktur der App definiert
+// App.js
+// Location: src/App.js
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -61,8 +64,8 @@ export default function App() {
             headerTintColor: COLORS.surface,
           })}
         >
+          {/* MAIN SCREENS */}
           <Tab.Screen name="Search" component={SearchPage} />
-          {/* <Tab.Screen name="Map" component={MapPage} /> */}
           <Tab.Screen name="Favorites" component={FavoritesPage} />
           <Tab.Screen name="Profile" component={ProfilePage} />
         </Tab.Navigator>
