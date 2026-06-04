@@ -65,7 +65,19 @@ export default function App() {
           })}
         >
           {/* MAIN SCREENS */}
-          <Tab.Screen name="Search" component={SearchPage} />
+          <Tab.Screen
+            name="Search"
+            component={SearchPage}
+            listeners={({ navigation }) => ({
+              tabPress: (e) => {
+                e.preventDefault();
+
+                navigation.navigate("Search", {
+                  resetSearch: Date.now(),
+                });
+              },
+            })}
+          />
           <Tab.Screen name="Favorites" component={FavoritesPage} />
           <Tab.Screen name="Profile" component={ProfilePage} />
         </Tab.Navigator>
