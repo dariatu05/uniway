@@ -31,6 +31,8 @@ import { MOCK_CALENDAR_PRICES } from "../data/mockSearch";
 // Person 3 — Ergebnisliste
 import ResultsPage from "./ResultsPage";
 
+import { TextInput } from "react-native";
+
 // Kalender Konfiguration
 LocaleConfig.locales["de"] = {
   monthNames: [
@@ -74,6 +76,43 @@ LocaleConfig.locales["de"] = {
   today: "Heute",
 };
 LocaleConfig.defaultLocale = "de";
+
+//clear button component for input fields
+
+function ClearableInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType,
+}) {
+  return (
+    <View style={styles.inputBlock}>
+      <Text style={styles.inputLabel}>{label}</Text>
+
+      <View style={styles.inputWrapper}>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          keyboardType={keyboardType}
+          placeholderTextColor="#9ca3af"
+          style={styles.clearableTextInput}
+        />
+
+        {value ? (
+          <TouchableOpacity
+            style={styles.insideClearButton}
+            onPress={() => onChangeText("")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.insideClearButtonText}>×</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </View>
+  );
+}
 
 export default function SearchScreen() {
   const route = useRoute();
@@ -259,10 +298,11 @@ export default function SearchScreen() {
           <BackButton onPress={onBackPress} />
           <Header title="Search Trip" subtitle="Find the cheapest route" />
           <Card>
-            <Input
+            <ClearableInput
               label="Start location"
               value={startLocation}
               onChangeText={setStartLocation}
+              placeholder="Enter start location"
             />
             <TouchableOpacity
               onPress={handleUseProfileLocation}
@@ -273,7 +313,6 @@ export default function SearchScreen() {
                 profile location
               </Text>
             </TouchableOpacity>
-
             <View style={styles.fieldGroup}>
               <View style={styles.stopHeaderRow}>
                 <Text style={styles.customLabel}>Stopovers</Text>
@@ -286,12 +325,13 @@ export default function SearchScreen() {
               </Text>
               {stops.map((stop, index) => (
                 <View key={`stop-${index}`} style={styles.stopRow}>
-                  <Input
+                  <ClearableInput
                     label={`Stopover ${index + 1}`}
                     value={stop}
                     onChangeText={(text) => updateStop(index, text)}
                     placeholder="Enter location"
                   />
+
                   <TouchableOpacity
                     style={styles.removeStopButton}
                     onPress={() => removeStop(index)}
@@ -302,13 +342,12 @@ export default function SearchScreen() {
                 </View>
               ))}
             </View>
-
-            <Input
+            <ClearableInput
               label="Destination"
               value={destination}
               onChangeText={setDestination}
+              placeholder="Enter destination"
             />
-
             <View style={styles.fieldGroup}>
               <Text style={styles.customLabel}>Time period (optional)</Text>
               <View style={styles.rowContainer}>
@@ -336,7 +375,6 @@ export default function SearchScreen() {
                 </View>
               </View>
             </View>
-
             <SettingRow
               label="Use default budget"
               value={useDefaultBudget}
@@ -348,13 +386,11 @@ export default function SearchScreen() {
               onChangeText={setMaxBudget}
               keyboardType="numeric"
             />
-
             <SettingRow
               label="Direct connections only"
               value={directOnly}
               onValueChange={setDirectOnly}
             />
-
             <View style={styles.fieldGroup}>
               <Text style={styles.customLabel}>Type of transport</Text>
               <Text style={styles.infoNote}>
@@ -390,7 +426,6 @@ export default function SearchScreen() {
                 })}
               </View>
             </View>
-
             {/* Fuel Cost Calculator - nur wenn Car ausgewählt ist */}
             {selectedTransports.includes("Car") && (
               <View style={styles.fieldGroup}>
@@ -442,7 +477,6 @@ export default function SearchScreen() {
                 </View>
               </View>
             )}
-
             <View style={styles.mainActions}>
               <Button
                 title="Reset"
@@ -673,5 +707,50 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     fontStyle: "italic",
     textAlign: "center",
+  },
+  inputBlock: {
+    marginBottom: 12,
+  },
+
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+
+  inputWrapper: {
+    position: "relative",
+    justifyContent: "center",
+  },
+
+  clearableTextInput: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingLeft: 14,
+    paddingRight: 42,
+    fontSize: 15,
+    color: COLORS.text,
+  },
+
+  insideClearButton: {
+    position: "absolute",
+    right: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: "#E5E7EB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  insideClearButtonText: {
+    color: "#6B7280",
+    fontSize: 20,
+    fontWeight: "900",
+    lineHeight: 22,
   },
 });
