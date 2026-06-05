@@ -142,6 +142,8 @@ export default function SearchScreen() {
   const [fuelPrice, setFuelPrice] = useState("");
   const [useDefaultFuelPrice, setUseDefaultFuelPrice] = useState(false);
   const [fuelCost, setFuelCost] = useState(null);
+  const [selectedReturnDate, setSelectedReturnDate] = useState("");
+  const [calendarSelectionMode, setCalendarSelectionMode] = useState("departure");
 
   const addStop = () => setStops((prev) => [...prev, ""]);
   const updateStop = (index, value) =>
@@ -260,6 +262,8 @@ export default function SearchScreen() {
     setFuelPrice("");
     setUseDefaultFuelPrice(false);
     setFuelCost(null);
+    setSelectedReturnDate("");
+    setCalendarSelectionMode("departure");
   };
 
   const resetSearchInputs = () => {
@@ -286,6 +290,8 @@ export default function SearchScreen() {
     setFuelPrice("");
     setUseDefaultFuelPrice(false);
     setFuelCost(null);
+    setSelectedReturnDate("");
+    setCalendarSelectionMode("departure");
   };
 
   useEffect(() => {
@@ -385,7 +391,15 @@ export default function SearchScreen() {
             <SettingRow
               label="Round Trip"
               value={isRoundTrip}
-              onValueChange={setIsRoundTrip}
+              onValueChange={(value) => {
+                setIsRoundTrip(value);
+                if (!value) {
+                  setReturnDateFrom("");
+                  setReturnDateTo("");
+                  setSelectedReturnDate("");
+                  setCalendarSelectionMode("departure");
+                }
+              }}
             />
 
             <View style={styles.fieldGroup}>
@@ -416,33 +430,33 @@ export default function SearchScreen() {
               </View>
             </View>
             {isRoundTrip && (
-            <View style={styles.fieldGroup}>
-              <Text style={styles.customLabel}>Return Time period (optional)</Text>
-              <View style={styles.rowContainer}>
-                <View style={styles.halfInput}>
-                  <Input
-                    label="From"
-                    placeholder="DD.MM"
-                    value={returnDateFrom}
-                    onChangeText={(text) =>
-                      setReturnDateFrom(text.replace(/[^0-9.]/g, ""))
-                    }
-                    keyboardType="decimal-pad"
-                  />
-                </View>
-                <View style={styles.halfInput}>
-                  <Input
-                    label="To"
-                    placeholder="DD.MM"
-                    value={returnDateTo}
-                    onChangeText={(text) =>
-                      setReturnDateTo(text.replace(/[^0-9.]/g, ""))
-                    }
-                    keyboardType="decimal-pad"
-                  />
+              <View style={styles.fieldGroup}>
+                <Text style={styles.customLabel}>Return Time period (optional)</Text>
+                <View style={styles.rowContainer}>
+                  <View style={styles.halfInput}>
+                    <Input
+                      label="From"
+                      placeholder="DD.MM"
+                      value={returnDateFrom}
+                      onChangeText={(text) =>
+                        setReturnDateFrom(text.replace(/[^0-9.]/g, ""))
+                      }
+                      keyboardType="decimal-pad"
+                    />
+                  </View>
+                  <View style={styles.halfInput}>
+                    <Input
+                      label="To"
+                      placeholder="DD.MM"
+                      value={returnDateTo}
+                      onChangeText={(text) =>
+                        setReturnDateTo(text.replace(/[^0-9.]/g, ""))
+                      }
+                      keyboardType="decimal-pad"
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
             )}
             <SettingRow
               label="Use default budget"
@@ -580,6 +594,29 @@ export default function SearchScreen() {
             subtitle={`${startLocation || "Start"}${stops.filter(Boolean).length > 0 ? " → " + stops.filter(Boolean).join(" → ") + " → " : " ➔ "}${destination || "Destination"}`}
           />
           <Card>
+            {isRoundTrip && (
+              <View style={styles.calendarModeContainer}>
+                <TouchableOpacity
+                  style={[styles.calendarModeTab, calendarSelectionMode === "departure" && styles.calendarModeTabActive]}
+                  onPress={() => setCalendarSelectionMode("departure")}
+                >
+                  <Text style={[styles.calendarModeText, calendarSelectionMode === "departure" && styles.calendarModeTextActive]}>
+                    Departure: {selectedDate || "--"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.calendarModeTab,
+                    calendarSelectionMode === "return" && styles.calendarModeTabActiveReturn
+                  ]}
+                  onPress={() => setCalendarSelectionMode("return")}
+                >
+                  <Text style={[styles.calendarModeText, calendarSelectionMode === "return" && styles.calendarModeTextActive]}>
+                    Return: {selectedReturnDate || "--"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <Calendar
               firstDay={1}
               theme={{
@@ -591,11 +628,33 @@ export default function SearchScreen() {
               dayComponent={({ date, state }) => {
                 const dateString = date.dateString;
                 const item = MOCK_CALENDAR_PRICES[dateString];
-                const isSelected = selectedDate === dateString;
+
+                const isSelectedDeparture = selectedDate === dateString;
+                const isSelectedReturn = isRoundTrip && selectedReturnDate === dateString;
+                const isSelected = isSelectedDeparture || isSelectedReturn;
+
                 return (
                   <TouchableOpacity
-                    onPress={() => setSelectedDate(dateString)}
-                    style={[styles.dayBox, isSelected && styles.selectedDayBox]}
+                    onPress={() => {
+                      if (isRoundTrip) {
+                        if (calendarSelectionMode === "departure") {
+                          setSelectedDate(dateString);
+                          setCalendarSelectionMode("return");
+                          if (selectedReturnDate && dateString > selectedReturnDate) {
+                            setSelectedReturnDate("");
+                          }
+                        } else {
+                          if (selectedDate && dateString < selectedDate) {
+                            alert("Return date cannot be earlier than departure date.");
+                          } else {
+                            setSelectedReturnDate(dateString);
+                          }
+                        }
+                      } else {
+                        setSelectedDate(dateString);
+                      }
+                    }}
+                    style={[styles.dayBox, isSelected && styles.selectedDayBox, isSelectedReturn && styles.selectedReturnDayBox]}
                   >
                     <Text
                       style={[
@@ -655,6 +714,7 @@ export default function SearchScreen() {
           selectedDate={selectedDate}
           maxBudget={maxBudget}
           selectedTransports={selectedTransports}
+          selectedReturnDate={selectedReturnDate}
           directOnly={directOnly}
           passengers={parseInt(passengers) || 1}
           onBack={onBackPress}
@@ -842,5 +902,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#6B7280",
     fontWeight: "500",
+  },
+  calendarModeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 10,
+    padding: 4,
+  },
+  calendarModeTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  calendarModeTabActive: {
+    backgroundColor: COLORS.primary,
+  },
+  calendarModeText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#4b5563",
+  },
+  calendarModeTabActiveReturn: {
+    backgroundColor: COLORS.secondary,
+  },
+  selectedReturnDayBox: {
+    borderColor: COLORS.secondary,
+  },
+  calendarModeTextActive: {
+    color: "#fff",
   },
 });
