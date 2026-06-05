@@ -694,11 +694,43 @@ export default function SearchScreen() {
                 <Text style={styles.legendText}>Expensive</Text>
               </View>
             </View>
-            <View style={styles.mainActions}>
+            {/* <View style={styles.mainActions}>
               <Button
                 title="Select date"
                 variant={selectedDate ? "primary" : "secondary"}
                 onPress={() => selectedDate && setShowRouteResults(true)}
+              />
+            </View> */}
+            <View style={styles.mainActions}>
+              {!isRoundTrip && (
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "center",
+                    marginBottom: 12,
+                    paddingVertical: 8,
+                  }}
+                  onPress={() => {
+                    setIsRoundTrip(true);
+                    setCalendarSelectionMode("return");
+                  }}
+                >
+                  <Text style={{
+                    color: COLORS.primary,
+                    fontWeight: "600",
+                    fontSize: 14,
+                  }}>
+                    + Add return date
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <Button
+                title={isRoundTrip ? "Select dates" : "Select date"}
+                variant={(isRoundTrip ? (selectedDate && selectedReturnDate) : selectedDate) ? "primary" : "secondary"}
+                onPress={() => {
+                  const canSubmit = isRoundTrip ? (selectedDate && selectedReturnDate) : selectedDate;
+                  if (canSubmit) setShowRouteResults(true);
+                }}
               />
             </View>
           </Card>
