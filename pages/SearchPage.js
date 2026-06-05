@@ -125,6 +125,7 @@ export default function SearchScreen() {
   // Speicher für Suchparameter
   const [startLocation, setStartLocation] = useState("");
   const [destination, setDestination] = useState("");
+  const [isRoundTrip, setIsRoundTrip] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
@@ -242,6 +243,7 @@ export default function SearchScreen() {
     setDateTo("");
     setMaxBudget("");
     setDirectOnly(false);
+    setIsRoundTrip(false);
     setSelectedTransports([]);
     setStops([]);
     setUseDefaultBudget(false);
@@ -264,6 +266,7 @@ export default function SearchScreen() {
     setDateFrom("");
     setDateTo("");
     setMaxBudget("");
+    setIsRoundTrip(false);
     setDirectOnly(false);
     setSelectedTransports([]);
     setStops([]);
@@ -369,6 +372,13 @@ export default function SearchScreen() {
               onChangeText={setDestination}
               placeholder="Enter destination"
             />
+
+            <SettingRow
+              label="Round Trip"
+              value={isRoundTrip}
+              onValueChange={setIsRoundTrip}
+            />
+
             <View style={styles.fieldGroup}>
               <Text style={styles.customLabel}>Time period (optional)</Text>
               <View style={styles.rowContainer}>
