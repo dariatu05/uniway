@@ -5,9 +5,9 @@
 // M4 update: receives stops[] from SearchPage and passes them to RouteCard so the full route is visible on each card.
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { saveFavoriteRoute } from "../api/storageApi";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { saveFavoriteRoute } from "../api/storageApi";
 
 import { BackButton, ScreenLayout } from "../components/CommonLayout";
 import { RouteCard } from "../components/RouteCard";
@@ -18,14 +18,14 @@ import { RouteDetailsPage } from "./RouteDetailsPage";
 
 const SORT_OPTIONS = [
   { key: "cheapest", label: " Price", icon: "tag" },
-  { key: "fastest",  label: " Speed", icon: "flash" },
-  { key: "best",     label: " Best",  icon: "crown" },
+  { key: "fastest", label: " Speed", icon: "flash" },
+  { key: "best", label: " Best", icon: "crown" },
 ];
 
 const TRANSPORT_MAP = {
-  Bus:   "bus",
+  Bus: "bus",
   Train: "train",
-  Car:   "car",
+  Car: "car",
   Plane: "plane",
 };
 
@@ -41,17 +41,41 @@ export default function ResultsPage({
   fuelCost,
   onBack,
 }) {
+  const [favorites, setFavorites] = useState(new Set());
   const [sortKey, setSortKey] = useState("cheapest");
   const [detailRoute, setDetailRoute] = useState(null);
 
-  async function handleSaveFavorite(route) {
-    const favoriteRoute = {
-      ...route,
-      date: selectedDate || new Date().toISOString(),
-      mainTransport: route.type,
-      bookingUrl: route.bookingUrl || null,
-    };
-    await saveFavoriteRoute(favoriteRoute);
+  // async function handleSaveFavorite(route) {
+  //   const favoriteRoute = {
+  //     ...route,
+  //     date: selectedDate || new Date().toISOString(),
+  //     mainTransport: route.type,
+  //     bookingUrl: route.bookingUrl || null,
+  //   };
+  //   await saveFavoriteRoute(favoriteRoute);
+  // }
+
+  async function handleFavoriteToggle(route) {
+    const isFavorite = favorites.has(route.id);
+
+    if (isFavorite) {
+      setFavorites(prev => {
+        const updated = new Set(prev);
+        updated.delete(route.id);
+        return updated;
+      });
+    } else {
+      setFavorites(prev => new Set(prev).add(route.id));
+
+      const favoriteRoute = {
+        ...route,
+        date: selectedDate || new Date().toISOString(),
+        mainTransport: route.type,
+        bookingUrl: route.bookingUrl || null,
+      };
+
+      await saveFavoriteRoute(favoriteRoute);
+    }
   }
 
   function getRoutePrice(route) {
@@ -76,8 +100,8 @@ export default function ResultsPage({
     const toMatch =
       to.trim() === "" || r.to.toLowerCase().includes(to.toLowerCase());
     const typeMatch = allowedTypes.includes(r.type?.toLowerCase());
-    const budgetOk  = getRoutePrice(r) <= budget;
-    const directOk  = !directOnly || r.transfers === 0;
+    const budgetOk = getRoutePrice(r) <= budget;
+    const directOk = !directOnly || r.transfers === 0;
     return fromMatch && toMatch && typeMatch && budgetOk && directOk;
   });
 
@@ -86,9 +110,9 @@ export default function ResultsPage({
 
   const sorted = [...ranked].sort((a, b) => {
     if (sortKey === "cheapest") return a.price - b.price;
-    if (sortKey === "fastest")  return a.durationMinutes - b.durationMinutes;
+    if (sortKey === "fastest") return a.durationMinutes - b.durationMinutes;
     if (a.label === "best" && b.label !== "best") return -1;
-    if (b.label === "best" && a.label !== "best") return  1;
+    if (b.label === "best" && a.label !== "best") return 1;
     return a.price - b.price;
   });
 
@@ -179,7 +203,8 @@ export default function ResultsPage({
               key={item.id}
               route={routeWithPrice}
               onPress={() => setDetailRoute(routeWithPrice)}
-              onFavorite={() => handleSaveFavorite(routeWithPrice)}
+              isFavorite={favorites.has(item.id)}
+              onFavorite={() => handleFavoriteToggle(routeWithPrice)}
             />
           );
         })

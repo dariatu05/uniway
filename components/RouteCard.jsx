@@ -6,7 +6,6 @@
 // M4 update: shows full route with stopovers
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { COLORS } from "../styles/colors";
@@ -19,11 +18,11 @@ const TRANSPORT_ICONS = {
   car: "car",
 };
 
-export function RouteCard({ route, onPress, onFavorite }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export function RouteCard({ route, onPress, onFavorite, isFavorite }) {
   const icon = TRANSPORT_ICONS[route.type?.toLowerCase()] || "bus";
   const labelText = getLabelText(route.label);
   const labelColor = getLabelColor(route.label);
+
 
   // Build full route string including stopovers
   // stops[] comes from SearchPage via ResultsPage → RouteCard
@@ -75,7 +74,6 @@ export function RouteCard({ route, onPress, onFavorite }) {
           <TouchableOpacity
             onPress={(event) => {
               event.stopPropagation();
-              setIsFavorite(true);
               if (onFavorite) {
                 onFavorite(route);
               }
@@ -84,7 +82,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
             <MaterialCommunityIcons
               name={isFavorite ? "heart" : "heart-outline"}
               size={24}
-              color={isFavorite ? "#b00020" : COLORS.primary}
+              color={isFavorite ? COLORS.primary : COLORS.primary}
             />
           </TouchableOpacity>
         </View>
