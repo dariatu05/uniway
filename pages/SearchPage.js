@@ -128,6 +128,8 @@ export default function SearchScreen() {
   const [isRoundTrip, setIsRoundTrip] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [returnDateFrom, setReturnDateFrom] = useState("");
+  const [returnDateTo, setReturnDateTo] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
   const [passengers, setPassengers] = useState("1");
   const [directOnly, setDirectOnly] = useState(false);
@@ -244,6 +246,8 @@ export default function SearchScreen() {
     setDestination("");
     setDateFrom("");
     setDateTo("");
+    setReturnDateFrom("");
+    setReturnDateTo("");
     setMaxBudget("");
     setDirectOnly(false);
     setIsRoundTrip(false);
@@ -268,6 +272,8 @@ export default function SearchScreen() {
     setDestination("");
     setDateFrom("");
     setDateTo("");
+    setReturnDateFrom("");
+    setReturnDateTo("");
     setMaxBudget("");
     setIsRoundTrip(false);
     setDirectOnly(false);
@@ -383,7 +389,7 @@ export default function SearchScreen() {
             />
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.customLabel}>Time period (optional)</Text>
+              <Text style={styles.customLabel}>Departure Time period (optional)</Text>
               <View style={styles.rowContainer}>
                 <View style={styles.halfInput}>
                   <Input
@@ -409,6 +415,35 @@ export default function SearchScreen() {
                 </View>
               </View>
             </View>
+            {isRoundTrip && (
+            <View style={styles.fieldGroup}>
+              <Text style={styles.customLabel}>Return Time period (optional)</Text>
+              <View style={styles.rowContainer}>
+                <View style={styles.halfInput}>
+                  <Input
+                    label="From"
+                    placeholder="DD.MM"
+                    value={returnDateFrom}
+                    onChangeText={(text) =>
+                      setReturnDateFrom(text.replace(/[^0-9.]/g, ""))
+                    }
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+                <View style={styles.halfInput}>
+                  <Input
+                    label="To"
+                    placeholder="DD.MM"
+                    value={returnDateTo}
+                    onChangeText={(text) =>
+                      setReturnDateTo(text.replace(/[^0-9.]/g, ""))
+                    }
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+              </View>
+            </View>
+            )}
             <SettingRow
               label="Use default budget"
               value={useDefaultBudget}
