@@ -3,6 +3,7 @@
 //
 // Tappable card that shows one route in the results list.
 // Rendered by ResultsPage; navigates to RouteDetailsPage on press.
+// M4 update: shows full route with stopovers
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -20,9 +21,14 @@ const TRANSPORT_ICONS = {
 
 export function RouteCard({ route, onPress, onFavorite }) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const icon = TRANSPORT_ICONS[route.type] || "bus";
+  const icon = TRANSPORT_ICONS[route.type?.toLowerCase()] || "bus";
   const labelText = getLabelText(route.label);
   const labelColor = getLabelColor(route.label);
+
+  // Build full route string including stopovers
+  // stops[] comes from SearchPage via ResultsPage → RouteCard
+  const stops = route.stops ?? [];
+  const fullRouteLabel = [route.from, ...stops, route.to].join(" → ");
 
   return (
     <TouchableOpacity
@@ -32,7 +38,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
       accessibilityRole="button"
       accessibilityLabel={`${route.from} to ${route.to}, ${route.price} euros`}
     >
-      {/* ── Top row: transport + label badge + heart ── */}
+      {/* Top row: transport + label badge + heart */}
       <View style={styles.topRow}>
         <View style={styles.iconRow}>
           <MaterialCommunityIcons
@@ -41,7 +47,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
             color={COLORS.primary}
           />
           <Text style={styles.transportText}>
-            {route.type.charAt(0).toUpperCase() + route.type.slice(1)}
+            {route.type?.charAt(0).toUpperCase() + route.type?.slice(1)}
           </Text>
         </View>
 
@@ -69,9 +75,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
           <TouchableOpacity
             onPress={(event) => {
               event.stopPropagation();
-
               setIsFavorite(true);
-
               if (onFavorite) {
                 onFavorite(route);
               }
@@ -86,16 +90,28 @@ export function RouteCard({ route, onPress, onFavorite }) {
         </View>
       </View>
 
-      {/* ── Route name ── */}
-      <Text style={styles.routeTitle}>
-        {route.from} → {route.to}
-      </Text>
+      {/* Full route title with stopovers */}
+      <Text style={styles.routeTitle}>{fullRouteLabel}</Text>
 
-      {/* ── Stats: price / duration / transfers ── */}
+      {/* Stopover chips (only shown if there are stops) */}
+      {stops.length > 0 && (
+        <View style={styles.stopsRow}>
+          <MaterialCommunityIcons
+            name="map-marker-path"
+            size={13}
+            color={COLORS.secondary}
+          />
+          <Text style={styles.stopsText}>
+            {stops.length} stopover{stops.length > 1 ? "s" : ""}:{" "}
+            {stops.join(", ")}
+          </Text>
+        </View>
+      )}
+
+      {/* Stats: price / duration / transfers */}
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>€{route.price}</Text>
-
           {route.passengers > 1 ? (
             <Text style={styles.pricePerPerson}>
               €{route.pricePerPerson} per person
@@ -118,7 +134,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
         </View>
       </View>
 
-      {/* ── Time row ── */}
+      {/* Time row */}
       <View style={styles.timeRow}>
         <MaterialCommunityIcons
           name="clock-outline"
@@ -174,6 +190,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  badgeIcon: {
+    marginRight: 4,
+  },
   badgeText: {
     color: "#fff",
     fontSize: 11,
@@ -183,7 +202,19 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: "700",
     color: COLORS.text,
-    marginBottom: 12,
+    marginBottom: 6,
+  },
+  // M4: stopover indicator row
+  stopsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 10,
+  },
+  stopsText: {
+    fontSize: 12,
+    color: COLORS.secondary,
+    fontWeight: "500",
   },
   statsRow: {
     flexDirection: "row",

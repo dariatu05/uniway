@@ -1,13 +1,11 @@
 // ResultsPage.jsx
 // Location: src/pages/ResultsPage.jsx
 //
-// Showes list of routes matching search criteria, with sorting options and detail view.
-// Uses mock data from src/data/mockRoutes.js and ranking logic from src/utils/routeRanking.js.
+// Shows list of routes matching search criteria, with sorting options and detail view.
+// M4 update: receives stops[] from SearchPage and passes them to RouteCard so the full route is visible on each card.
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
 import { saveFavoriteRoute } from "../api/storageApi";
-
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -20,19 +18,21 @@ import { RouteDetailsPage } from "./RouteDetailsPage";
 
 const SORT_OPTIONS = [
   { key: "cheapest", label: " Price", icon: "tag" },
-  { key: "fastest", label: " Speed", icon: "flash" },
-  { key: "best", label: " Best", icon: "crown" },
+  { key: "fastest",  label: " Speed", icon: "flash" },
+  { key: "best",     label: " Best",  icon: "crown" },
 ];
+
 const TRANSPORT_MAP = {
-  Bus: "bus",
+  Bus:   "bus",
   Train: "train",
-  Car: "car",
+  Car:   "car",
   Plane: "plane",
 };
 
 export default function ResultsPage({
   from = "",
   to = "",
+  stops = [],           // M4: stopover cities from SearchPage
   selectedDate = "",
   maxBudget = "",
   selectedTransports = [],
@@ -51,7 +51,6 @@ export default function ResultsPage({
       mainTransport: route.type,
       bookingUrl: route.bookingUrl || null,
     };
-
     await saveFavoriteRoute(favoriteRoute);
   }
 
@@ -62,8 +61,7 @@ export default function ResultsPage({
     return route.price * passengerCount;
   }
 
-
-  // ── Filter mock routes ──────────────────────────────────────────────────
+  //  Filter 
   const budget = parseFloat(maxBudget) || Infinity;
   const passengerCount = Math.max(1, passengers);
 
@@ -77,24 +75,24 @@ export default function ResultsPage({
       from.trim() === "" || r.from.toLowerCase().includes(from.toLowerCase());
     const toMatch =
       to.trim() === "" || r.to.toLowerCase().includes(to.toLowerCase());
-    const typeMatch = allowedTypes.includes(r.type.toLowerCase());
-    const budgetOk = getRoutePrice(r) <= budget;
-    const directOk = !directOnly || r.transfers === 0;
+    const typeMatch = allowedTypes.includes(r.type?.toLowerCase());
+    const budgetOk  = getRoutePrice(r) <= budget;
+    const directOk  = !directOnly || r.transfers === 0;
     return fromMatch && toMatch && typeMatch && budgetOk && directOk;
   });
 
-  // ── Rank + sort ─────────────────────────────────────────────────────────
+  //  Rank + sort 
   const ranked = rankRoutes(filtered.length > 0 ? filtered : MOCK_ROUTES);
 
   const sorted = [...ranked].sort((a, b) => {
     if (sortKey === "cheapest") return a.price - b.price;
-    if (sortKey === "fastest") return a.durationMinutes - b.durationMinutes;
+    if (sortKey === "fastest")  return a.durationMinutes - b.durationMinutes;
     if (a.label === "best" && b.label !== "best") return -1;
-    if (b.label === "best" && a.label !== "best") return 1;
+    if (b.label === "best" && a.label !== "best") return  1;
     return a.price - b.price;
   });
 
-  // ── Detail view (replaces list) ─────────────────────────────────────────
+  //  Detail view 
   if (detailRoute) {
     return (
       <RouteDetailsPage
@@ -104,15 +102,20 @@ export default function ResultsPage({
     );
   }
 
-  // ── List view ───────────────────────────────────────────────────────────
-  const subtitle =
+  //  Subtitle: full route string including stopovers
+  const validStops = stops.filter((s) => s.trim() !== "");
+  const routeString =
     from && to
-      ? `${from} → ${to}  ·  ${sorted.length} result${sorted.length !== 1 ? "s" : ""}`
-      : `${sorted.length} result${sorted.length !== 1 ? "s" : ""} found`;
+      ? [from, ...validStops, to].join(" → ")
+      : "";
+
+  const subtitle = routeString
+    ? `${routeString}  ·  ${sorted.length} result${sorted.length !== 1 ? "s" : ""}`
+    : `${sorted.length} result${sorted.length !== 1 ? "s" : ""} found`;
 
   return (
     <ScreenLayout>
-      {/* ── Header ── */}
+      {/* Header */}
       <View style={styles.headerBlock}>
         {onBack && <BackButton onPress={onBack} />}
         <Text style={styles.title}>Results</Text>
@@ -129,7 +132,7 @@ export default function ResultsPage({
         )}
       </View>
 
-      {/* ── Sort tabs ── */}
+      {/* Sort tabs */}
       <View style={styles.sortRow}>
         <Text style={styles.sortLabel}>Sort by:</Text>
         <View style={styles.sortOptions}>
@@ -145,7 +148,7 @@ export default function ResultsPage({
               <MaterialCommunityIcons
                 name={opt.icon}
                 size={16}
-                color={COLORS.secondary}
+                color={sortKey === opt.key ? "#fff" : COLORS.secondary}
                 style={styles.sortIcon}
               />
               <Text
@@ -161,35 +164,25 @@ export default function ResultsPage({
         </View>
       </View>
 
-      {/* ── Route list / empty state ── */}
+      {/* Route list / empty state */}
       {sorted.length > 0 ? (
-        sorted.map((item) => (
-          <RouteCard
-            key={item.id}
-            route={{
-              ...item,
-              price: getRoutePrice(item),
-              pricePerPerson: item.price,
-              passengers: passengerCount,
-            }}
-            onPress={() =>
-              setDetailRoute({
-                ...item,
-                price: getRoutePrice(item),
-                pricePerPerson: item.price,
-                passengers: passengerCount,
-              })
-            }
-            onFavorite={() =>
-              handleSaveFavorite({
-                ...item,
-                price: getRoutePrice(item),
-                pricePerPerson: item.price,
-                passengers: passengerCount,
-              })
-            }
-          />
-        ))
+        sorted.map((item) => {
+          const routeWithPrice = {
+            ...item,
+            price: getRoutePrice(item),
+            pricePerPerson: item.price,
+            passengers: passengerCount,
+            stops: validStops,   // M4: pass stopovers into each card
+          };
+          return (
+            <RouteCard
+              key={item.id}
+              route={routeWithPrice}
+              onPress={() => setDetailRoute(routeWithPrice)}
+              onFavorite={() => handleSaveFavorite(routeWithPrice)}
+            />
+          );
+        })
       ) : (
         <View style={styles.emptyState}>
           <MaterialCommunityIcons
@@ -212,13 +205,6 @@ const styles = StyleSheet.create({
   headerBlock: {
     marginBottom: 14,
   },
-  backLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    marginLeft: -5,
-  },
-  backLinkText: { color: COLORS.primary, fontWeight: "600", fontSize: 16 },
   title: {
     fontSize: 30,
     fontWeight: "900",
@@ -272,6 +258,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   },
+  sortIcon: {
+    marginRight: 2,
+  },
   sortButtonText: {
     fontSize: 12,
     fontWeight: "600",
@@ -279,9 +268,6 @@ const styles = StyleSheet.create({
   },
   sortButtonTextActive: {
     color: "#fff",
-  },
-  listContent: {
-    paddingBottom: 30,
   },
   emptyState: {
     flex: 1,
