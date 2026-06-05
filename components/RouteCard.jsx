@@ -95,7 +95,14 @@ export function RouteCard({ route, onPress, onFavorite }) {
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>€{route.price}</Text>
-          <Text style={styles.statLabel}>Price</Text>
+
+          {route.passengers > 1 ? (
+            <Text style={styles.pricePerPerson}>
+              €{route.pricePerPerson} per person
+            </Text>
+          ) : (
+            <Text style={styles.statLabel}>Price</Text>
+          )}
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
@@ -215,5 +222,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.text,
     opacity: 0.5,
+  },
+  pricePerPerson: {
+    fontSize: 11,
+    color: COLORS.text,
+    opacity: 0.55,
+    marginTop: 2,
   },
 });

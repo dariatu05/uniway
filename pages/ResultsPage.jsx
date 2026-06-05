@@ -37,6 +37,7 @@ export default function ResultsPage({
   maxBudget = "",
   selectedTransports = [],
   directOnly = false,
+  passengers = 1,
   onBack,
 }) {
   const [sortKey, setSortKey] = useState("cheapest");
@@ -55,6 +56,7 @@ export default function ResultsPage({
 
   // ── Filter mock routes ──────────────────────────────────────────────────
   const budget = parseFloat(maxBudget) || Infinity;
+  const passengerCount = Math.max(1, passengers);
 
   const allowedTypes =
     selectedTransports.length === 0
@@ -67,7 +69,7 @@ export default function ResultsPage({
     const toMatch =
       to.trim() === "" || r.to.toLowerCase().includes(to.toLowerCase());
     const typeMatch = allowedTypes.includes(r.type);
-    const budgetOk = r.price <= budget;
+    const budgetOk = r.price * passengerCount <= budget;
     const directOk = !directOnly || r.transfers === 0;
     return fromMatch && toMatch && typeMatch && budgetOk && directOk;
   });
@@ -155,9 +157,28 @@ export default function ResultsPage({
         sorted.map((item) => (
           <RouteCard
             key={item.id}
-            route={item}
-            onPress={() => setDetailRoute(item)}
-            onFavorite={() => handleSaveFavorite(item)}
+            route={{
+              ...item,
+              price: item.price * passengerCount,
+              pricePerPerson: item.price,
+              passengers: passengerCount,
+            }}
+            onPress={() =>
+              setDetailRoute({
+                ...item,
+                price: item.price * passengerCount,
+                pricePerPerson: item.price,
+                passengers: passengerCount,
+              })
+            }
+            onFavorite={() =>
+              handleSaveFavorite({
+                ...item,
+                price: item.price * passengerCount,
+                pricePerPerson: item.price,
+                passengers: passengerCount,
+              })
+            }
           />
         ))
       ) : (

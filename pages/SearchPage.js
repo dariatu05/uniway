@@ -128,6 +128,7 @@ export default function SearchScreen() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
+  const [passengers, setPassengers] = useState("1");
   const [directOnly, setDirectOnly] = useState(false);
   const [selectedTransports, setSelectedTransports] = useState([]);
   const [stops, setStops] = useState([]);
@@ -234,6 +235,7 @@ export default function SearchScreen() {
   };
 
   const clearSearchFields = () => {
+    setPassengers("1");
     setStartLocation("");
     setDestination("");
     setDateFrom("");
@@ -256,6 +258,7 @@ export default function SearchScreen() {
     setShowCalendar(false);
     setShowRouteResults(false);
 
+    setPassengers("1");
     setStartLocation("");
     setDestination("");
     setDateFrom("");
@@ -402,6 +405,14 @@ export default function SearchScreen() {
               label="Max. Budget"
               value={maxBudget}
               onChangeText={setMaxBudget}
+              keyboardType="numeric"
+            />
+            <Input
+              label="Passengers"
+              value={passengers}
+              onChangeText={(text) =>
+                setPassengers(text.replace(/[^0-9]/g, ""))
+              }
               keyboardType="numeric"
             />
             <SettingRow
@@ -597,6 +608,7 @@ export default function SearchScreen() {
           maxBudget={maxBudget}
           selectedTransports={selectedTransports}
           directOnly={directOnly}
+          passengers={parseInt(passengers) || 1}
           onBack={onBackPress}
         />
       )}
