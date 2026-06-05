@@ -749,6 +749,7 @@ export default function SearchScreen() {
           selectedReturnDate={selectedReturnDate}
           directOnly={directOnly}
           passengers={parseInt(passengers) || 1}
+          fuelCost={fuelCost}
           onBack={onBackPress}
         />
       )}

@@ -38,6 +38,7 @@ export default function ResultsPage({
   selectedTransports = [],
   directOnly = false,
   passengers = 1,
+  fuelCost,
   onBack,
 }) {
   const [sortKey, setSortKey] = useState("cheapest");
@@ -54,6 +55,14 @@ export default function ResultsPage({
     await saveFavoriteRoute(favoriteRoute);
   }
 
+  function getRoutePrice(route) {
+    if (route.type?.toLowerCase() === "car" && fuelCost) {
+      return parseFloat(fuelCost);
+    }
+    return route.price * passengerCount;
+  }
+
+
   // ── Filter mock routes ──────────────────────────────────────────────────
   const budget = parseFloat(maxBudget) || Infinity;
   const passengerCount = Math.max(1, passengers);
@@ -68,8 +77,8 @@ export default function ResultsPage({
       from.trim() === "" || r.from.toLowerCase().includes(from.toLowerCase());
     const toMatch =
       to.trim() === "" || r.to.toLowerCase().includes(to.toLowerCase());
-    const typeMatch = allowedTypes.includes(r.type);
-    const budgetOk = r.price * passengerCount <= budget;
+    const typeMatch = allowedTypes.includes(r.type.toLowerCase());
+    const budgetOk = getRoutePrice(r) <= budget;
     const directOk = !directOnly || r.transfers === 0;
     return fromMatch && toMatch && typeMatch && budgetOk && directOk;
   });
@@ -159,14 +168,14 @@ export default function ResultsPage({
             key={item.id}
             route={{
               ...item,
-              price: item.price * passengerCount,
+              price: getRoutePrice(item),
               pricePerPerson: item.price,
               passengers: passengerCount,
             }}
             onPress={() =>
               setDetailRoute({
                 ...item,
-                price: item.price * passengerCount,
+                price: getRoutePrice(item),
                 pricePerPerson: item.price,
                 passengers: passengerCount,
               })
@@ -174,7 +183,7 @@ export default function ResultsPage({
             onFavorite={() =>
               handleSaveFavorite({
                 ...item,
-                price: item.price * passengerCount,
+                price: getRoutePrice(item),
                 pricePerPerson: item.price,
                 passengers: passengerCount,
               })
