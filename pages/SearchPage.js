@@ -233,6 +233,24 @@ export default function SearchScreen() {
     calculateFuelCost(fuelDistance, fuelConsumption, value);
   };
 
+  const clearSearchFields = () => {
+    setStartLocation("");
+    setDestination("");
+    setDateFrom("");
+    setDateTo("");
+    setMaxBudget("");
+    setDirectOnly(false);
+    setSelectedTransports([]);
+    setStops([]);
+    setUseDefaultBudget(false);
+    setSelectedDate("");
+    setFuelDistance("");
+    setFuelConsumption("");
+    setFuelPrice("");
+    setUseDefaultFuelPrice(false);
+    setFuelCost(null);
+  };
+
   const resetSearchInputs = () => {
     setShowDetails(false);
     setShowCalendar(false);
@@ -478,11 +496,12 @@ export default function SearchScreen() {
               </View>
             )}
             <View style={styles.mainActions}>
-              <Button
-                title="Reset"
-                onPress={resetSearchInputs}
-                variant="secondary"
-              />
+              <TouchableOpacity
+                onPress={clearSearchFields}
+                style={styles.resetTextButton}
+              >
+                <Text style={styles.resetText}>Clear all</Text>
+              </TouchableOpacity>
               <Button
                 title="Show prices in calendar"
                 onPress={() => setShowCalendar(true)}
@@ -660,7 +679,7 @@ const styles = StyleSheet.create({
   },
   transportText: { fontSize: 13, fontWeight: "500", color: COLORS.text },
   transportTextActive: { color: "#fff" },
-  mainActions: { marginTop: 20 },
+  mainActions: { marginTop: 0 },
   profileLocationLink: { marginTop: -10, paddingVertical: 5 },
   profileLocationText: {
     color: COLORS.primary,
@@ -752,5 +771,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "900",
     lineHeight: 22,
+  },
+
+  resetTextButton: {
+    alignSelf: "center",
+    paddingVertical: 6,
+  },
+
+  resetText: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontWeight: "500",
   },
 });
