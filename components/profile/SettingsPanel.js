@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { COLORS } from "../../styles/colors";
 
@@ -6,6 +7,14 @@ import SettingRow from "./SettingRow";
 
 // Panel component for editing user profile settings
 export default function SettingsPanel({ settings, onChange }) {
+  const [fuelPriceText, setFuelPriceText] = useState(
+    String(settings.defaultFuelPrice)
+  );
+
+  useEffect(() => {
+    setFuelPriceText(String(settings.defaultFuelPrice));
+  }, [settings.defaultFuelPrice]);
+
   // Updates one field inside the settings object
   function updateField(field, value) {
     onChange({
@@ -93,9 +102,17 @@ export default function SettingsPanel({ settings, onChange }) {
         description="Fuel price per liter in EUR"
       >
         <TextInput
-          value={String(settings.defaultFuelPrice)}
-          onChangeText={(value) =>
-            updateField("defaultFuelPrice", Number(value) || 0)
+          value={fuelPriceText}
+          onChangeText={(value) => {
+            setFuelPriceText(value);
+            const normalizedValue = value.replace(/,/g, ".");
+            const parsedPrice = Number(normalizedValue);
+            if (!Number.isNaN(parsedPrice)) {
+              updateField("defaultFuelPrice", parsedPrice);
+            }
+          }}
+          onBlur={() =>
+            setFuelPriceText(String(settings.defaultFuelPrice || ""))
           }
           keyboardType="decimal-pad"
           style={styles.input}

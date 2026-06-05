@@ -1,7 +1,14 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { COLORS } from '../styles/colors';
 
-export const Input = ({ label, placeholder, value, onChangeText }) => (
+export const Input = ({
+    label,
+    placeholder,
+    value,
+    onChangeText,
+    keyboardType,
+    editable = true,
+}) => (
     <View style={styles.container}>
         {label ? <Text style={styles.label}>{label}</Text> : null}
         <TextInput
@@ -10,6 +17,8 @@ export const Input = ({ label, placeholder, value, onChangeText }) => (
             placeholderTextColor="#999999"
             value={value}
             onChangeText={onChangeText}
+            keyboardType={keyboardType}
+            editable={editable}
         />
     </View>
 );
