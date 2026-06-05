@@ -70,11 +70,14 @@ export default function App() {
             component={SearchPage}
             listeners={({ navigation }) => ({
               tabPress: (e) => {
-                e.preventDefault();
+                // Nur zurücksetzen, wenn der Search-Tab bereits geöffnet ist
+                if (navigation.isFocused()) {
+                  e.preventDefault();
 
-                navigation.navigate("Search", {
-                  resetSearch: Date.now(),
-                });
+                  navigation.setParams({
+                    resetSearch: Date.now(),
+                  });
+                }
               },
             })}
           />

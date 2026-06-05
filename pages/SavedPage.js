@@ -1,7 +1,9 @@
 // Page for displaying and managing saved favorite routes
 // SavedPage.js
 // Location: src/pages/SavedPage.js
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+
 import {
   Linking,
   ScrollView,
@@ -28,36 +30,34 @@ export default function SavedPage() {
   const [expiredRoutes, setExpiredRoutes] = useState([]);
 
   // Runs once when the page is opened
-  useEffect(() => {
-    loadFavorites();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, []),
+  );
 
   // Loads saved routes and expired routes from storage
-  function loadFavorites() {
-    const savedRoutes = getFavoriteRoutes();
-    const expired = getExpiredRoutes();
+  async function loadFavorites() {
+    const savedRoutes = await getFavoriteRoutes();
+    const expired = await getExpiredRoutes();
 
-    setFavorites(savedRoutes);
-    setExpiredRoutes(expired);
+    setFavorites(Array.isArray(savedRoutes) ? savedRoutes : []);
+    setExpiredRoutes(Array.isArray(expired) ? expired : []);
   }
 
   // Deletes one selected route from favorites
-  function handleDelete(routeId) {
-    const updatedFavorites = deleteFavoriteRoute(routeId);
+  async function handleDelete(routeId) {
+    const updatedFavorites = await deleteFavoriteRoute(routeId);
 
     setFavorites(updatedFavorites);
-
-    // Refresh expired routes after deleting
-    setExpiredRoutes(getExpiredRoutes());
+    setExpiredRoutes(await getExpiredRoutes());
   }
 
   // Deletes all routes that are already expired
-  function handleDeleteAllExpired() {
-    const updatedFavorites = clearExpiredRoutes();
+  async function handleDeleteAllExpired() {
+    const updatedFavorites = await clearExpiredRoutes();
 
     setFavorites(updatedFavorites);
-
-    // After deleting them, expired list is empty
     setExpiredRoutes([]);
   }
 

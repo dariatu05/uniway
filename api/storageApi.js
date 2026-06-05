@@ -1,39 +1,8 @@
-// API for managing local storage of favorites and profile settings
-// storageApi.js
-// Location: src/api/storageApi.js
-import { mockFavorites } from "../data/mockFavorites";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Keys for saving data
 const FAVORITES_KEY = "uniway_favorite_routes";
 const PROFILE_KEY = "uniway_profile_settings";
 
-// Backup storage if localStorage is not available
-const memoryStorage = {};
-
-function hasLocalStorage() {
-  return typeof localStorage !== "undefined";
-}
-
-// Reads value from localStorage or memory backup
-function getItem(key) {
-  if (hasLocalStorage()) {
-    return localStorage.getItem(key);
-  }
-
-  return memoryStorage[key] || null;
-}
-
-// Saves value to localStorage or memory backup
-function setItem(key, value) {
-  if (hasLocalStorage()) {
-    localStorage.setItem(key, value);
-    return;
-  }
-
-  memoryStorage[key] = value;
-}
-
-// Default profile settings
 const defaultSettings = {
   name: "UniWay User",
   defaultLocation: "Wien",
@@ -45,29 +14,23 @@ const defaultSettings = {
   preferredTransports: ["bus", "train"],
 };
 
-// Gets saved favorite routes
-export function getFavoriteRoutes() {
-  const storedFavorites = getItem(FAVORITES_KEY);
+export async function getFavoriteRoutes() {
+  const storedFavorites = await AsyncStorage.getItem(FAVORITES_KEY);
 
   if (!storedFavorites) {
-    return mockFavorites;
+    return [];
   }
 
-  try {
-    return JSON.parse(storedFavorites);
-  } catch (error) {
-    return mockFavorites;
-  }
+  return JSON.parse(storedFavorites);
 }
 
-// Saves all favorite routes
-export function saveFavoriteRoutes(routes) {
-  setItem(FAVORITES_KEY, JSON.stringify(routes));
+export async function saveFavoriteRoutes(routes) {
+  await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(routes));
 }
 
-// Adds one route to favorites
-export function saveFavoriteRoute(route) {
-  const favorites = getFavoriteRoutes();
+export async function saveFavoriteRoute(route) {
+  const favorites = await getFavoriteRoutes();
+
   const alreadyExists = favorites.some((item) => item.id === route.id);
 
   if (alreadyExists) {
@@ -75,52 +38,66 @@ export function saveFavoriteRoute(route) {
   }
 
   const updatedFavorites = [...favorites, route];
-  saveFavoriteRoutes(updatedFavorites);
+  await saveFavoriteRoutes(updatedFavorites);
 
   return updatedFavorites;
 }
 
-// Deletes one favorite route
-export function deleteFavoriteRoute(routeId) {
-  const favorites = getFavoriteRoutes();
+export async function deleteFavoriteRoute(routeId) {
+  const favorites = await getFavoriteRoutes();
 
   const updatedFavorites = favorites.filter((route) => route.id !== routeId);
 
-  saveFavoriteRoutes(updatedFavorites);
+  await saveFavoriteRoutes(updatedFavorites);
 
   return updatedFavorites;
 }
 
-// Deletes all expired favorite routes
-export function deleteExpiredFavoriteRoutes(isExpiredFn) {
-  const favorites = getFavoriteRoutes();
+export async function clearExpiredRoutes() {
+  const favorites = await getFavoriteRoutes();
 
-  const updatedFavorites = favorites.filter((route) => !isExpiredFn(route));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  saveFavoriteRoutes(updatedFavorites);
+  const updatedFavorites = favorites.filter((route) => {
+    const routeDate = new Date(route.date);
+    routeDate.setHours(0, 0, 0, 0);
+
+    return routeDate >= today;
+  });
+
+  await saveFavoriteRoutes(updatedFavorites);
 
   return updatedFavorites;
 }
 
-// Gets saved profile settings
-export function getProfileSettings() {
-  const storedSettings = getItem(PROFILE_KEY);
+export async function getExpiredRoutes() {
+  const favorites = await getFavoriteRoutes();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return favorites.filter((route) => {
+    const routeDate = new Date(route.date);
+    routeDate.setHours(0, 0, 0, 0);
+
+    return routeDate < today;
+  });
+}
+
+export async function getProfileSettings() {
+  const storedSettings = await AsyncStorage.getItem(PROFILE_KEY);
 
   if (!storedSettings) {
     return defaultSettings;
   }
 
-  try {
-    return {
-      ...defaultSettings,
-      ...JSON.parse(storedSettings),
-    };
-  } catch (error) {
-    return defaultSettings;
-  }
+  return {
+    ...defaultSettings,
+    ...JSON.parse(storedSettings),
+  };
 }
 
-// Saves profile settings
-export function saveProfileSettings(settings) {
-  setItem(PROFILE_KEY, JSON.stringify(settings));
+export async function saveProfileSettings(settings) {
+  await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(settings));
 }
