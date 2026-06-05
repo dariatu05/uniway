@@ -27,7 +27,7 @@ export function RouteCard({ route, onPress, onFavorite }) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={onFavorite}
+      onPress={onPress}
       activeOpacity={0.85}
       accessibilityRole="button"
       accessibilityLabel={`${route.from} to ${route.to}, ${route.price} euros`}
