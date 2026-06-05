@@ -5,17 +5,31 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 
 import { getProfileSettings, saveProfileSettings } from "../api/storageApi";
-
 import ProfileHeader from "../components/profile/ProfileHeader";
 import SettingsPanel from "../components/profile/SettingsPanel";
 import { COLORS } from "../styles/colors";
 
 export default function ProfilePage() {
-  const [settings, setSettings] = useState(() => getProfileSettings());
+  const [settings, setSettings] = useState(null);
 
   useEffect(() => {
-    saveProfileSettings(settings);
+    async function loadSettings() {
+      const loadedSettings = await getProfileSettings();
+      setSettings(loadedSettings);
+    }
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    if (settings) {
+      saveProfileSettings(settings);
+    }
   }, [settings]);
+
+  if (!settings) {
+    return null;
+  }
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>

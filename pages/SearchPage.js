@@ -170,20 +170,21 @@ export default function SearchScreen() {
   };
 
   // Hilfsfunktion, um den Profil-Standort live zu übernehmen
-  const handleUseProfileLocation = () => {
-    const currentSettings = getProfileSettings();
+  const handleUseProfileLocation = async () => {
+    const currentSettings = await getProfileSettings();
+
     if (currentSettings.defaultLocation) {
       setStartLocation(currentSettings.defaultLocation);
     }
   };
 
   // Hilfsfunktion, um das Standard-Budget live aus der API zu holen
-  const handleToggleDefaultBudget = (value) => {
+  const handleToggleDefaultBudget = async (value) => {
     setUseDefaultBudget(value);
+
     if (value) {
-      const currentSettings = getProfileSettings();
-      // Nutzt den aktuellen Wert aus der storageApi (standardBudget)
-      setMaxBudget(currentSettings.standardBudget.toString());
+      const currentSettings = await getProfileSettings();
+      setMaxBudget((currentSettings.standardBudget ?? "").toString());
     } else {
       setMaxBudget("");
     }
@@ -198,11 +199,13 @@ export default function SearchScreen() {
     );
   };
 
-  const handleUseDefaultFuelPrice = () => {
-    const currentSettings = getProfileSettings();
+  const handleUseDefaultFuelPrice = async () => {
+    const currentSettings = await getProfileSettings();
+
     const defaultPrice = currentSettings.defaultFuelPrice ?? "";
     setUseDefaultFuelPrice(true);
     setFuelPrice(defaultPrice.toString());
+
     calculateFuelCost(fuelDistance, fuelConsumption, defaultPrice.toString());
   };
 

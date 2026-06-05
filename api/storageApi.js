@@ -5,7 +5,7 @@ const PROFILE_KEY = "uniway_profile_settings";
 
 const defaultSettings = {
   name: "UniWay User",
-  defaultLocation: "Wien",
+  defaultLocation: "Vienna",
   locationEnabled: false,
   pushEnabled: false,
   currency: "EUR",
